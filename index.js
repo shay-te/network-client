@@ -4,7 +4,4 @@
  */
 
 'use strict';
-module.exports = {
-    'Network': require('./lib/Network'),
-    'NetworkModule' : require('./lib/Network')
-};
+module.exports = require('./lib/Network');

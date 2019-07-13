@@ -1,44 +1,57 @@
 #!/usr/bin/env node
 
+
+global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+
 var network = require('network-client');
 var HttpMethod = network.HttpMethod;
+var ContentType = network.contentType;
 
 
-var NetworkCandidates = {
-    doSimpleGet: function(success, error) {
-        var url = '/api/module_1';
-		this.network.send(HttpMethod.GET, url, undefined, success, error);
-    },
+var NetworkCandidates = function(network) {
 
-	goCreateWithParams: function(launcherTypeId, success, error) {
-	    var url = '/api/module_1';
-		this.network.send(HttpMethod.GET, url, undefined, success, error);
+    return {
+        doSimpleGet: function(success, error) {
+            var url = '/api/module_1';
+            network.send(HttpMethod.GET, url, undefined, ContentType.APPLICATION_JSON, success, error);
+        },
 
-		this.network.sendForm(HttpMethod.POST, "/api/launcher", {launcherTypeId:launcherTypeId}, success, error);
-	},
+        doSimpleGetPromise: function() {
+            var url = '/api/module_1';
+            return network.sendPromise(HttpMethod.GET, url, undefined, ContentType.APPLICATION_JSON);
+        },
 
-	removeLauncher: function(launcherId, success, error) {
-		this.network.send(HttpMethod.DELETE, "/api/launcher/" + launcherId , undefined, success, error);
-	},
 
-	getLaunchers: function(success, error) {
-		this.network.send(HttpMethod.GET, "/api/launcher/all", undefined, success, error);
-	},
+        doCreateWithParams: function(launcherTypeId, success, error) {
+            var url = '/api/module_1';
+            network.send(HttpMethod.GET, url, {launcherTypeId:launcherTypeId}, ContentType.APPLICATION_JSON, success, error);
+        },
 
-	updateLauncher: function(launcherProps, success, error) {
-	    this.network.send(HttpMethod.PUT, "/api/launcher", launcherProps, success, error);
-	}
+        doRemove: function(launcherId, success, error) {
+            network.send(HttpMethod.DELETE, "/api/launcher/" + launcherId , ContentType.APPLICATION_JSON, undefined, success, error);
+        },
+
+    };
+
 };
 
 
+network.registerModule('candidate', NetworkCandidates);
+
+network.candidate.doSimpleGet(function() {
+    console.log('succress');
+    }, function(e) {
+    console.log("ERROR");
+    console.log(e)
+    }
+);
 
 
 
-network.registerModule(NetworkModule('candidate', NetworkCandidates));
 
-
-
-
+network.candidate.doSimpleGetPromise()
+    .then(function() {console.log("Promise success");})
+    .catch(function() {console.log("Promise error");})
 
 
 
