@@ -9,6 +9,7 @@
   "author": "shay tessler",
   "license": "MIT",
   "dependencies": {
+    "assert": "^2.0.0",
     "network-client": "^1.0.0",
     "xmlhttprequest": "^1.8.0"
   }

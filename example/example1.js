@@ -3,56 +3,82 @@
 
 global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
+
+
 var network = require('network-client');
 var HttpMethod = network.HttpMethod;
 var ContentType = network.contentType;
 
+var assert = require('assert');
 
-var NetworkCandidates = function(network) {
+
+var NetworkPosts = function(network) {
 
     return {
-        doSimpleGet: function(success, error) {
-            var url = '/api/module_1';
-            network.send(HttpMethod.GET, url, undefined, ContentType.APPLICATION_JSON, success, error);
+        allCallbacks: function(success, error) {
+            var url = "https://jsonplaceholder.typicode.com/posts";
+            network.send(HttpMethod.GET, url, {}, ContentType.APPLICATION_JSON, success, error);
         },
 
-        doSimpleGetPromise: function() {
-            var url = '/api/module_1';
-            return network.sendPromise(HttpMethod.GET, url, undefined, ContentType.APPLICATION_JSON);
+        all: function() {
+            var url = "https://jsonplaceholder.typicode.com/posts";
+            return network.sendPromise(HttpMethod.GET, url, {}, ContentType.APPLICATION_JSON);
         },
 
-
-        doCreateWithParams: function(launcherTypeId, success, error) {
-            var url = '/api/module_1';
-            network.send(HttpMethod.GET, url, {launcherTypeId:launcherTypeId}, ContentType.APPLICATION_JSON, success, error);
-        },
-
-        doRemove: function(launcherId, success, error) {
-            network.send(HttpMethod.DELETE, "/api/launcher/" + launcherId , ContentType.APPLICATION_JSON, undefined, success, error);
-        },
+        create: function(title, body, userId) {
+            var url = "https://jsonplaceholder.typicode.com/posts";
+            var post =  {title: title,
+                        body: body,
+                        userId: userId};
+            return network.sendPromise(HttpMethod.POST, url, post, ContentType.APPLICATION_JSON);
+        }
 
     };
 
 };
 
 
-network.registerModule('candidate', NetworkCandidates);
+network.registerModule('posts', NetworkPosts);
 
-network.candidate.doSimpleGet(function() {
-    console.log('succress');
-    }, function(e) {
-    console.log("ERROR");
-    console.log(e)
+network.posts.allCallbacks(
+    function(all) {
+        assert.notEqual(all, undefined, 'all cannot be null');
+        console.log('allCallbacks success, all :' + all);
+        console.log(all);
+    }, function(err) {
+        assert.fail('network error!')
+        console.log("allCallbacks error");
     }
 );
 
 
 
 
-network.candidate.doSimpleGetPromise()
-    .then(function() {console.log("Promise success");})
-    .catch(function() {console.log("Promise error");})
+network.posts.all()
+    .then(function(all) {
+        assert.notEqual(all, undefined, 'all cannot be null');
+        console.log("Promise success");
+        console.log(all);
+    })
+    .catch(function(err) {
+        assert.fail('network error!')
+        console.log("Promise error");
+    }
+);
 
+var post = {
+    title: 'foo',
+    body: 'bar',
+    userId: 1
+};
 
-
-
+network.posts.create(post)
+    .then(function(post){
+        assert.notEqual(post, undefined, 'post cannot be null');
+        console.log('Promise create success');
+        console.log(post);
+    })
+    .catch(function(err) {
+        assert.fail('network error!')
+        console.log('Promise create error');
+    });
