@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 
-
 global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-
-
 
 var network = require('network-client');
 var HttpMethod = network.HttpMethod;
@@ -37,14 +34,12 @@ var NetworkPosts = function(network) {
 
 };
 
-
 network.registerModule('posts', NetworkPosts);
 
 network.posts.allCallbacks(
     function(all) {
         assert.notEqual(all, undefined, 'all cannot be null');
-        console.log('allCallbacks success, all :' + all);
-        console.log(all);
+        console.log('allCallbacks success');
     }, function(err) {
         assert.fail('network error!')
         console.log("allCallbacks error");
@@ -52,13 +47,10 @@ network.posts.allCallbacks(
 );
 
 
-
-
 network.posts.all()
     .then(function(all) {
         assert.notEqual(all, undefined, 'all cannot be null');
         console.log("Promise success");
-        console.log(all);
     })
     .catch(function(err) {
         assert.fail('network error!')
@@ -76,7 +68,6 @@ network.posts.create(post)
     .then(function(post){
         assert.notEqual(post, undefined, 'post cannot be null');
         console.log('Promise create success');
-        console.log(post);
     })
     .catch(function(err) {
         assert.fail('network error!')
