@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
+
 global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+
+
 
 var network = require('network-client');
 var HttpMethod = network.HttpMethod;
@@ -14,12 +17,12 @@ var NetworkPosts = function(network) {
     return {
         allCallbacks: function(success, error) {
             var url = "https://jsonplaceholder.typicode.com/posts";
-            network.send(HttpMethod.GET, url, {}, ContentType.APPLICATION_JSON, success, error);
+            network.get(url, {}, ContentType.APPLICATION_JSON, success, error);
         },
 
         all: function() {
             var url = "https://jsonplaceholder.typicode.com/posts";
-            return network.sendPromise(HttpMethod.GET, url, {}, ContentType.APPLICATION_JSON);
+            return network.get_promise(HttpMethod.GET, url, {}, ContentType.APPLICATION_JSON);
         },
 
         create: function(title, body, userId) {
@@ -27,24 +30,27 @@ var NetworkPosts = function(network) {
             var post =  {title: title,
                         body: body,
                         userId: userId};
-            return network.sendPromise(HttpMethod.POST, url, post, ContentType.APPLICATION_JSON);
+            return network.post_promise(url, post, ContentType.APPLICATION_JSON);
         }
 
     };
 
 };
 
+
 network.registerModule('posts', NetworkPosts);
 
 network.posts.allCallbacks(
     function(all) {
         assert.notEqual(all, undefined, 'all cannot be null');
-        console.log('allCallbacks success');
+        console.log('allCallbacks success, all :' + all);
     }, function(err) {
         assert.fail('network error!')
         console.log("allCallbacks error");
     }
 );
+
+
 
 
 network.posts.all()
@@ -54,7 +60,6 @@ network.posts.all()
     })
     .catch(function(err) {
         assert.fail('network error!')
-        console.log("Promise error");
     }
 );
 
@@ -71,5 +76,4 @@ network.posts.create(post)
     })
     .catch(function(err) {
         assert.fail('network error!')
-        console.log('Promise create error');
     });
