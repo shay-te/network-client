@@ -13,30 +13,21 @@ var assert = require('assert');
 
 
 var NetworkPosts = function(network) {
-
     return {
         allCallbacks: function(success, error) {
-            var url = "https://jsonplaceholder.typicode.com/posts";
-            network.get(url, {}, ContentType.APPLICATION_JSON, success, error);
+            network.get("https://jsonplaceholder.typicode.com/posts", {}, ContentType.APPLICATION_JSON, undefined, success, error);
         },
 
         all: function() {
-            var url = "https://jsonplaceholder.typicode.com/posts";
-            return network.get_promise(HttpMethod.GET, url, {}, ContentType.APPLICATION_JSON);
+            return network.get_promise("https://jsonplaceholder.typicode.com/posts", {}, ContentType.APPLICATION_JSON, undefined);
         },
 
         create: function(title, body, userId) {
-            var url = "https://jsonplaceholder.typicode.com/posts";
-            var post =  {title: title,
-                        body: body,
-                        userId: userId};
-            return network.post_promise(url, post, ContentType.APPLICATION_JSON);
+            var data =  {title: title, body: body, userId: userId};
+            return network.post_promise("https://jsonplaceholder.typicode.com/posts", data, ContentType.APPLICATION_JSON, undefined);
         }
-
     };
-
 };
-
 
 network.registerModule('posts', NetworkPosts);
 
