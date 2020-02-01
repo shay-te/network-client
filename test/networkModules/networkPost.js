@@ -46,8 +46,8 @@ Network.registerModule('post', function(network) {
             network.put_promise(buildUrl(postId), data, {}, success, error);
         },
 
-        deleteCB: function(postId, data, success, error) {
-            return network.del(buildUrl(postId), data, success, error);
+        deleteCB: function(postId, success, error) {
+            return network.del(buildUrl(postId), {}, {}, success, error);
         }
 
     };
