@@ -21,5 +21,12 @@
   "bugs": {
     "url": "https://github.com/shacoshe/network-client/issues"
   },
-  "homepage": "https://github.com/shacoshe/network-client#readme"
+  "homepage": "https://github.com/shacoshe/network-client#readme",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^7.0.1"
+  },
+  "dependencies": {
+    "xmlhttprequest": "^1.8.0"
+  }
 }
