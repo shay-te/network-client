@@ -1,6 +1,4 @@
-var Network = require('../../lib/NetworkClient.js')
-
-Network.registerModule('comment', function(network) {
+module.exports = function(network) {
 
     function buildUrl(postId, commentId) {
         var  url = "https://jsonplaceholder.typicode.com/posts" + postId;
@@ -30,4 +28,4 @@ Network.registerModule('comment', function(network) {
             return network.put(buildUrl(postId, commentId), data);
         }
     };
-});
+};

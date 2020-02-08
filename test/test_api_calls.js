@@ -2,14 +2,12 @@ global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 var expect = require('chai').expect;
 var assert = require('chai').assert;
+
 var NetworkClient = require("../lib/NetworkClient.js");
-var HttpMethod = NetworkClient.HttpMethod;
-var ContentType = NetworkClient.ContentType;
+var Network = new NetworkClient();
+Network.registerModule("posts", require("./networkModules/networkPost.js"));
+Network.registerModule("comments", require("./networkModules/networkComment.js"));
 
-
-
-require("./networkModules/networkPost.js");
-require("./networkModules/networkComment.js");
 
 var failCallback = function(err) {
     console.error(err);
@@ -43,45 +41,45 @@ var validateDelete = function(post) {
 
 describe("Validate all requests are returning", function() {
     it("Run all requests types promise", function() {
-        NetworkClient.post.all()
+        Network.posts.all()
             .then(function(all) {validateAll(all)})
             .catch(failCallback);
 
-        NetworkClient.post.create(1, "post title" ,"post body")
+        Network.posts.create(1, "post title" ,"post body")
             .then(function(post){validateCreateUpdate(post)})
             .catch(failCallback);
 
-        NetworkClient.post.get(1)
+        Network.posts.get(1)
             .then(function(post){validateGet(post);})
             .catch(failCallback);
 
-        NetworkClient.post.update(1, {"title": "one title", "body": "one body"})
+        Network.posts.update(1, {"title": "one title", "body": "one body"})
             .then(function(post){validateCreateUpdate(post)})
             .catch(failCallback);
 
-        NetworkClient.post.delete(1)
+        Network.posts.delete(1)
             .then(function(post){validateDelete(post);})
             .catch(failCallback);
     });
 
     it("Run all requests types callback", function() {
-        NetworkClient.post.allCB(
+        Network.posts.allCB(
             function(all) {validateAll(all)},
             failCallback);
 
-        NetworkClient.post.createCB(1, "post title" ,"post body",
+        Network.posts.createCB(1, "post title" ,"post body",
             function(post){validateCreateUpdate(post)},
             failCallback);
 
-        NetworkClient.post.getCB(1,
+        Network.posts.getCB(1,
             function(post){validateGet(post);},
             failCallback);
 
-        NetworkClient.post.updateCB(1, {"title": "one title", "body": "one body"},
+        Network.posts.updateCB(1, {"title": "one title", "body": "one body"},
             function(post){validateCreateUpdate(post)},
             failCallback);
 
-        NetworkClient.post.deleteCB(1,
+        Network.posts.deleteCB(1,
             function(post){validateDelete(post);},
             failCallback);
     });

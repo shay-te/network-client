@@ -22,7 +22,7 @@ npm install network-client
 
 ### Running tests
     
-    npx mocha
+    npx mocha --full-trace --exit
 
 ## Contributing
 

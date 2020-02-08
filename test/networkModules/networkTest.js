@@ -1,34 +1,27 @@
-var Network = require('../../lib/NetworkClient.js')
-
-
-Network.registerModule('test', function(network, ) {
-
-    function buildUrl(postId, commentId) {
-        var  url = "https://localhost:" + postId;
-        if(commentId) { url = url + "/comments/" + commentId; }
+module.exports = function(network, port) {
+    function buildUrl(path) {
+        var  url = "http://127.0.0.1:" + port;
+        if(path) { url = url + "/" + path; }
         return url;
     }
-
     return {
-        allCallbacks: function(postId, success, error) {
-            return network.get(buildUrl(postId), {}, {}, success, error);
+        ding: function() {
+            return network.post_promise(buildUrl('ding'));
         },
-
-        all: function(postId) {
-            return network.get_promise(buildUrl(postId));
+        clear_errors: function() {
+            return network.post_promise(buildUrl('clear_errors'));
         },
-
-        create: function(postId, name, email, body) {
-            var data =  {name: name, email: email, body: body};
-            return network.post_promise(buildUrl(postId), data);
+        get_stats: function() {
+            return network.get_promise(buildUrl('get_stats'));
         },
-
-        get: function(postId, commentId) {
-            return network.get(buildUrl(postId, commentId));
+        drop_connection: function(retries, backOffFactor) {
+            return network.post_promise(buildUrl('drop_connection'), {}, {retries: retries, backOffFactor: backOffFactor});
         },
-
-        update: function(postId, commentId, data) {
-            return network.put(buildUrl(postId, commentId), data);
+        timeout: function() {
+            return network.post_promise(buildUrl('timeout'));
+        },
+        get_info: function(storeExpiration) {
+            return network.get_promise(buildUrl('get_info'), {}, {store: true, storeExpiration: storeExpiration})
         }
     };
-});
+};

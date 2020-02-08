@@ -4,4 +4,4 @@
  */
 
 'use strict';
-module.exports = require('./lib/Network');
+module.exports = require('./lib/NetworkClient.js');

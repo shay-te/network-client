@@ -1,6 +1,5 @@
-var Network = require('../../lib/NetworkClient.js')
+module.exports = function(network, params) {
 
-Network.registerModule('post', function(network) {
     function buildUrl(postId) {
         var  url = "https://jsonplaceholder.typicode.com/posts";
         if(postId) { url = url + "/" + postId; }
@@ -49,6 +48,5 @@ Network.registerModule('post', function(network) {
         deleteCB: function(postId, success, error) {
             return network.del(buildUrl(postId), {}, {}, success, error);
         }
-
     };
-});
+};

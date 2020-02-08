@@ -10,12 +10,13 @@ First, we will configure Network Client to set the headers the are important to 
 
 ```javascript
 var NetworkClient = require("network-client");
+var Network = new NetworkClient();
 
-NetworkClient.addRequestHeader("Cache-control", ["no-cache", "no-store"]);
-NetworkClient.addRequestHeader("Pragma", "no-cache");
-NetworkClient.addRequestHeader("Expires", "0");
+Network.addRequestHeader("Cache-control", ["no-cache", "no-store"]);
+Network.addRequestHeader("Pragma", "no-cache");
+Network.addRequestHeader("Expires", "0");
 ...
-NetworkClient.removeRequestHeader("some-header");
+Network.removeRequestHeader("some-header");
 ```
 
 we can also add conditional headers 
@@ -29,7 +30,7 @@ if(tokenElement && tokenElement.length > 0) {
         }
         return; // Don't return anything will skip this header
     }
-    NetworkClient.addRequestHeader("X-CSRFToken", checkCsrfHeader);
+    Network.addRequestHeader("X-CSRFToken", checkCsrfHeader);
 }
 ```
 
@@ -40,7 +41,7 @@ in cases where native Promise is not supported, you can tell NetworkClient what 
 
  
 ```javascript
-NetworkClient.setPromise(MyPromiseObject);
+Network.setPromise(MyPromiseObject);
 ```
 
 # Network Events
@@ -66,12 +67,12 @@ var netowrkListener = new NetworkClient.NetworkListener({
         }
     }    
 })
-NetworkClient.addNetworkListener(networkListener);
+Network.addNetworkListener(networkListener);
 
 ...
 ...
 
-NetworkClient.removeNetworkListener(networkListener);
+Network.removeNetworkListener(networkListener);
 ```
 
 
@@ -81,7 +82,7 @@ Any request can be configured individually if no configuration options were spec
 options are represented as a JSON object and can be overridden in the following manner 
 
 ```javascript 
-NetworkClient.setDefaultOptions({"json": true, "retries": 0, "backOffFactor": 0, "store": false, ...})
+Network = new NetworkClient({"json": true, "retries": 0, "backOffFactor": 0, "store": false, ...});
 ```
 
 Available options are
