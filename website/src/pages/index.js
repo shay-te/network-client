@@ -8,32 +8,29 @@ import styles from './styles.module.css';
 
 const features = [
   {
-    title: <>Easy to Use</>,
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    title: <>Small Footprint</>,
+    imageUrl: 'img/undraw_Playful_cat_rchv.svg',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Weight only 14KB
       </>
     ),
   },
   {
-    title: <>Focus on What Matters</>,
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    title: <>Declarative</>,
+    imageUrl: 'img/undraw_to_do_list_a49b.svg',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Define network calls upfront and call them as API method
       </>
     ),
   },
   {
-    title: <>Powered by React</>,
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    title: <>Plug-able</>,
+    imageUrl: 'img/undraw_monitor_iqpq.svg',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Separate your network capabilities into modules
       </>
     ),
   },
@@ -74,6 +71,20 @@ function Home() {
               to={useBaseUrl('docs/main')}>
               Get Started
             </Link>
+
+            <span className={styles['index-ctas-github-button']}>
+              <iframe
+                src="https://ghbtns.com/github-btn.html?user=shacoshe&amp;repo=network-client&amp;type=star&amp;count=false&amp;size=large"
+                frameBorder={0}
+                scrolling={0}
+                width={160}
+                height={30}
+                style={{marginLeft: '10px', marginTop: '5px'}}
+                title="GitHub Stars"
+              />
+            </span>
+
+
           </div>
         </div>
       </header>

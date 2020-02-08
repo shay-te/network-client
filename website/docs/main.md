@@ -6,9 +6,9 @@ sidebar_label: Network Client
 
 ## What is Network Client
 
-Network-Client it's a small foot print javascript REST client. 
-aim to give advanced capebilities in a declarative simple interface. 
-it has no depeendencies and written to support old browsrs. 
+Network-Client it's a small footprint javascript REST client. 
+aim to give advanced capabilities in a declarative simple interface. 
+it has no dependencies and written to support old browses. 
 
 ### Installing
 
@@ -20,16 +20,13 @@ npm install network-client
 
     https://github.com/shacoshe/network-client/tree/master/example
 
-
-### Configuration
-
-## What can i do with network client
-
+### Running tests
+    
+    npx mocha
 
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
 
 ## Authors
 

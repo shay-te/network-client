@@ -1,35 +1,62 @@
-var assert = require('chai').assert;
+let assert = require('chai').assert;
 
-var NetworkClient = require('../lib/NetworkClient.js')
+let NetworkClient = require('../lib/NetworkClient.js')
 
+require('./networkModules/networkPost.js');
+
+let HttpMethod = NetworkClient.HttpMethod;
+let ContentType = NetworkClient.ContentType;
 
 global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 
-var HttpMethod = NetworkClient.HttpMethod;
-var ContentType = NetworkClient.ContentType;
-//
+let validatePostAll = function(method, url, data, options) {
+    assert.equal(method, HttpMethod.GET);
+    assert.equal(url, "https://jsonplaceholder.typicode.com/posts");
+    assert.deepEqual(data, {});
+    assert.equal(options['store'], false);
+    assert.equal(options['storeExpiration:'], undefined);
+}
+
+let validatePostGet = function(method, url, data, options) {
+    assert.equal(method, HttpMethod.GET);
+    assert.equal(url, "https://jsonplaceholder.typicode.com/posts/1");
+    assert.deepEqual(data, {});
+    assert.equal(options['store'], false);
+    assert.equal(options['storeExpiration:'], undefined);
+}
+
+
 describe('Validate listeners are called', function() {
 
     it('should return -1 when the value is not present', async function() {
         //WAIT FOR OTHER TEST EVENTS TO CLEAR
         let waitEventsAreClearTime = 2000;
         this.timeout(waitEventsAreClearTime + 4000); // Don't fail test for timeout
-        var promise = new Promise(function(resolve, reject) {
+        let promise = new Promise(function(resolve, reject) {
             setTimeout(function() {resolve("done!");}, waitEventsAreClearTime);
         });
         await promise;
 
-        var networkStartCalled = 0;
-        var networkEndCalled = 0;
-        var networkErrorCalled = 0;
+        let networkStartCalled = 0;
+        let networkEndCalled = 0;
+        let networkErrorCalled = 0;
 
         assert.throws(function() {NetworkClient.addNetworkListener({});}, "");
 
-        var networkListener = new NetworkClient.NetworkListener({
-            networkStart: function(requestData) {networkStartCalled++; },
-            networkEnd: function(requestData) { networkEndCalled++; },
-            networkError: function(requestData) { networkErrorCalled++; },
+        let networkListener = new NetworkClient.NetworkListener({
+            networkStart: function(method, url, data, options) {
+                validatePostAll(method, url, data, options);
+                networkStartCalled++;
+            },
+            networkEnd: function(method, url, data, options) {
+                validatePostAll(method, url, data, options);
+                networkEndCalled++;
+            },
+            networkError: function(method, url, data, options) {
+                validatePostAll(method, url, data, options);
+                networkErrorCalled++;
+            },
         });
         NetworkClient.addNetworkListener(networkListener);
         await NetworkClient.post.all()
@@ -39,13 +66,17 @@ describe('Validate listeners are called', function() {
         NetworkClient.removeNetworkListener(networkListener);
 
         //Creating "NetworkListener" only with "networkStart" method.
-        var networkListenerPartial = new NetworkClient.NetworkListener({
-            networkStart: function(requestData) {networkStartCalled++; }
+        let networkListenerPartial = new NetworkClient.NetworkListener({
+            networkStart: function(method, url, data, options) {
+                validatePostGet(method, url, data, options);
+                networkStartCalled++;
+            }
         });
         NetworkClient.addNetworkListener(networkListenerPartial);
-        await NetworkClient.post.all()
+        await NetworkClient.post.get(1)
         assert.equal(networkStartCalled, 2);
         assert.equal(networkEndCalled, 1);
         assert.equal(networkErrorCalled, 0);
     });
+
 });
