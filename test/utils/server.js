@@ -4,10 +4,13 @@ var path = require('path');
 
 var server_name = 'web_server';
 var server_version = '1.0.0';
+let querystring = require('querystring');
+
 
 const server = restify.createServer({name: server_name, version: server_version});
 server.use(restify.plugins.acceptParser(server.acceptable));
 server.use(restify.plugins.queryParser());
+server.use(restify.plugins.urlEncodedBodyParser({ mapParams : false }));
 server.use(restify.plugins.bodyParser({ mapParams: true }));
 server.use(restify.plugins.acceptParser(server.acceptable));
 
@@ -63,6 +66,27 @@ server.get('/get_info',
                 get_info++;
                 res.send("info");
             });
+
+
+server.post('/post_info_params_json',
+            function (req, res, next) {
+                if(JSON.parse(req.body).json_1) {
+                    res.send("ok");
+                } else {
+                    handleError(next, "invalid json");
+                }
+            });
+
+server.post('/post_info_params_form',
+            function (req, res, next) {
+                if(querystring.parse(req.body).form_1) {
+                    res.send("ok");
+                } else {
+                    handleError(next, "invalid form");
+                }
+            });
+
+
 
 console.log('WEB Server starting')
 var WEBServer = {
