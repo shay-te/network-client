@@ -3,29 +3,38 @@ global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 let expect = require('chai').expect;
 let assert = require('chai').assert;
 
-let port = 8901;
-let server = require('./utils/server.js');
-server.start(port);
-var Helpers = require('./utils/helpers.js');
+let Helpers = require('./utils/helpers.js');
 
-var NetworkClient = require("../lib/NetworkClient.js");
-var HttpMethod = NetworkClient.HttpMethod;
-var ContentType = NetworkClient.ContentType;
-var Network = new NetworkClient();
-
-Network.registerModule("test", require("./networkModules/networkTest.js"), port);
-
-var failCallback = function(err) {
+let failCallback = function(err) {
     console.error(err);
     assert.fail("network error!");
 }
 
 describe("Validate options", function() {
+    let Network;
+    let server;
+    before(function(done) {
+        let port = 8901;
+        server = require('./utils/server.js');
+        server.start(port);
+
+        let NetworkClient = require("../lib/NetworkClient.js");
+        Network = new NetworkClient({baseURL: "http://127.0.0.1:" + port + "/"});
+        Network.registerModule("test", require("./networkModules/networkTest.js"), port);
+        done();
+    });
+
+    after(function(done) {
+        server.stop();
+        done()
+    });
+
     it("Validate basic request", async function() {
         await Network.test.ding();
     });
 
     it("Drop connection retries", async function() {
+        this.timeout(3000);
         let backOffFactor = 100;
         let startTime = Date.now();
         try {
@@ -52,7 +61,7 @@ describe("Validate options", function() {
         let info = await Network.test.get_info(storeExpiration);
         assert.equal(info, "info");
 
-        for(var i = 0 ; i < 10 ; i++) {
+        for(let i = 0 ; i < 10 ; i++) {
             info = await Network.test.get_info(storeExpiration);
             assert.equal(info, "info");
         }
@@ -74,10 +83,12 @@ describe("Validate options", function() {
         assert.equal(stats.timeoutCount, 10);
         assert.equal(stats.get_info, 2);
 
-        // 2. should i expose the storage and build key for user control ?
+        // 1. register single method
         // 3. docs
+        // 4. upload example
+        //
 
-        server.stop();
+
     });
 });
 

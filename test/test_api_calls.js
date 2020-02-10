@@ -1,33 +1,28 @@
 global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-var expect = require('chai').expect;
-var assert = require('chai').assert;
-
-var NetworkClient = require("../lib/NetworkClient.js");
-var Network = new NetworkClient();
-Network.registerModule("posts", require("./networkModules/networkPost.js"));
-Network.registerModule("comments", require("./networkModules/networkComment.js"));
+let expect = require('chai').expect;
+let assert = require('chai').assert;
 
 
-var failCallback = function(err) {
+
+let failCallback = function(err) {
     console.error(err);
     assert.fail("network error!");
 }
 
-
-var validateAll = function(all) {
+let validateAll = function(all) {
     assert.notEqual(all, undefined);
     assert.equal(typeof(all), "object");
     expect(all.length).to.be.above(1);
 }
 
-var validateCreateUpdate = function(post) {
+let validateCreateUpdate = function(post) {
     postId = post["id"];
     assert.notEqual(post, undefined);
     assert.equal(typeof(post), "object");
 }
 
-var validateGet = function(post) {
+let validateGet = function(post) {
     assert.notEqual(post, undefined);
     assert.equal(typeof(post), "object");
     assert.equal(post.id, 1);
@@ -35,11 +30,21 @@ var validateGet = function(post) {
     assert.notEqual(post.body, undefined);
 }
 
-var validateDelete = function(post) {
+let validateDelete = function(post) {
     assert.notEqual(post, undefined);
 }
 
 describe("Validate all requests are returning", function() {
+    let Network;
+    before(function(done) {
+        let NetworkClient = require("../lib/NetworkClient.js");
+        Network = new NetworkClient({baseURL: "https://jsonplaceholder.typicode.com/"});
+
+        Network.registerModule("posts", require("./networkModules/networkPost.js"));
+        Network.registerModule("comments", require("./networkModules/networkComment.js"));
+        done();
+    });
+
     it("Run all requests types promise", function() {
         Network.posts.all()
             .then(function(all) {validateAll(all)})

@@ -1,35 +1,39 @@
 let assert = require('chai').assert;
 global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-var Helpers = require('./utils/helpers.js');
-var NetworkClient = require("../lib/NetworkClient.js");
-
-var Network = new NetworkClient();
-var ContentType = NetworkClient.ContentType;
-
-Network.registerModule("posts", require("./networkModules/networkPost.js"));
-Network.registerModule("comments", require("./networkModules/networkComment.js"));
+let Helpers = require('./utils/helpers.js');
 
 
-
-let validatePostAll = function(method, url, data, options) {
-    assert.equal(method, Network.HttpMethod.GET);
-    assert.equal(url, "https://jsonplaceholder.typicode.com/posts");
-    assert.deepEqual(data, {});
-    assert.equal(options['store'], false);
-    assert.equal(options['storeExpiration:'], undefined);
-}
-
-let validatePostGet = function(method, url, data, options) {
-    assert.equal(method, Network.HttpMethod.GET);
-    assert.equal(url, "https://jsonplaceholder.typicode.com/posts/1");
-    assert.deepEqual(data, {});
-    assert.equal(options['store'], false);
-    assert.equal(options['storeExpiration:'], undefined);
-}
 
 
 describe('Validate listeners are called', function() {
+    let Network;
+
+    let validatePostAll = function(method, url, data, options) {
+        assert.equal(method, Network.HttpMethod.GET);
+        assert.equal(url, "https://jsonplaceholder.typicode.com/posts");
+        assert.deepEqual(data, {});
+        assert.equal(options['store'], false);
+        assert.equal(options['storeExpiration:'], undefined);
+    }
+
+    let validatePostGet = function(method, url, data, options) {
+        assert.equal(method, Network.HttpMethod.GET);
+        assert.equal(url, "https://jsonplaceholder.typicode.com/posts/1");
+        assert.deepEqual(data, {});
+        assert.equal(options['store'], false);
+        assert.equal(options['storeExpiration:'], undefined);
+    }
+
+    before(function(done) {
+        let NetworkClient = require("../lib/NetworkClient.js");
+
+        Network = new NetworkClient({baseURL: "https://jsonplaceholder.typicode.com/"});
+
+        Network.registerModule("posts", require("./networkModules/networkPost.js"));
+        Network.registerModule("comments", require("./networkModules/networkComment.js"));
+        done();
+    });
 
     it('should return -1 when the value is not present', async function() {
         //WAIT FOR OTHER TEST EVENTS TO CLEAR

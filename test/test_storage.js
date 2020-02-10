@@ -5,7 +5,7 @@ let assert = require('chai').assert;
 
 process.env.NODE_ENV = 'test'
 var NetworkClient = require("../lib/NetworkClient.js");
-var Network = new NetworkClient();
+var Network = new NetworkClient({baseURL: "https://jsonplaceholder.typicode.com/"});
 
 
 describe("Validate storage work properly", function() {
@@ -84,8 +84,6 @@ describe("Validate storage work properly", function() {
         let requestData = {"username": "shastalka", "password": "yonty smonty"}
         let storeData = {"will": "timeout"};
 
-        let key = Network._build_store_key(method, url, requestData);
-
         Network._toStorage(method, url, requestData, storeData, undefined);
 
         this.timeout(400);
@@ -98,7 +96,7 @@ describe("Validate storage work properly", function() {
             fetchData = Network._fromStorage(method, url, requestData);
             assert.deepEqual(fetchData, storeData);
 
-        }, 210);
+        }, 300);
     });
 
 });

@@ -1,7 +1,7 @@
 module.exports = function(network, params) {
 
     function buildUrl(postId) {
-        var  url = "https://jsonplaceholder.typicode.com/posts";
+        var  url = "posts";
         if(postId) { url = url + "/" + postId; }
         return url;
     }
