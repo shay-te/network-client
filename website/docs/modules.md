@@ -10,14 +10,14 @@ Modules are a greate way to group REST operation, make seperation of concerns an
 
 ###### networkItem.js
 ```javascript
-Network.registerModule('item', function(network) {
+Network.registerModule('item', function(network, additionalData) {
     var options = {};
 	return {
 		get: function(item_id, success, error) {
-			return network.get_promise('/api/item/' + item_id);
+			return network.get_promise('api/item/' + item_id);
 		},
 		set: function(item_id, data, success, error) {
-			return network.post_promise('/api/item/' + item_id, data);
+			return network.post_promise('api/item/' + item_id, data);
 		}
 	};
 });

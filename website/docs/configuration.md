@@ -36,9 +36,8 @@ if(tokenElement && tokenElement.length > 0) {
 
 # Promise Support
 
-by default, NetwokrClient will use the native Promise object.   
-in cases where native Promise is not supported, you can tell NetworkClient what is you Promise instance
-
+By default, NetwokrClient will use the native Promise object.   
+in cases where native Promise is not available, you can tell NetworkClient what is you Promise object.
  
 ```javascript
 Network.setPromise(MyPromiseObject);
@@ -91,7 +90,8 @@ Available options are
 * `headers` additional to  `addRequestHeader/removeRequestHeader`. (default: `{}`)
 * `retries` number of retires if the request return with `status_code >= 300 and status_code != 304`. (default: `0`)
 * `backOffFactor` number of milli seconds between each retry. (default: `0`)
-* `store` true/false when a request is successful the result will be stored. another request with the same methods, url, params will cause fetching the last stored result. (default: `false`)  
+* `store` true/false when a request is successful the result will be stored. (all method types can be stored)     
+         calling another request with the same methods, url, params will cause fetching the last stored result. (default: `false`)  
 * `storeExpiration` have 3 options that control how much time results are stored. 
     * `undefined` never expires, will use `localStorage` if available, otherwise will use a polyfill that will expire on reload.
     * `0` expires on reload (default option)
