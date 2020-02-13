@@ -1,4 +1,4 @@
-module.exports = function(network) {
+var networkComments = function(network) {
 
     function buildUrl(postId, commentId) {
         var  url = "posts" + postId;
@@ -29,3 +29,7 @@ module.exports = function(network) {
         }
     };
 };
+
+if(typeof process !== 'undefined' && process.versions != null && process.versions.node != null) {
+    module.exports = networkComments;
+}

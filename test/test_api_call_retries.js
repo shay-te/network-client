@@ -86,8 +86,6 @@ describe("Validate options", function() {
         // 1. register single method
         // 3. docs
         // 4. upload example
-        //
-
 
     });
 });

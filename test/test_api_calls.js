@@ -65,6 +65,10 @@ describe("Validate all requests are returning", function() {
         Network.posts.delete(1)
             .then(function(post){validateDelete(post);})
             .catch(failCallback);
+
+        Network.posts.getUse(1)
+            .then(function(post){validateGet(post);})
+            .catch(failCallback);
     });
 
     it("Run all requests types callback", function() {

@@ -1,10 +1,8 @@
-# NetworkClient
+# Network-Client
 
-## What is Network Client
-
-Network-Client it's a small footprint javascript REST client. 
-aim to give advanced capabilities in a declarative simple interface. 
-it has no dependencies and written to support old browses. 
+Network-Client it's a small footprint javascript REST client.    
+Aim to give a declarative simple interface with capabilities of storage, retries And event handling.    
+it has no dependencies and written to support old browsers like IE8.  
 
 ### Installing
 
@@ -14,11 +12,32 @@ npm install network-client
 
 ### Example
 
-    https://github.com/shacoshe/network-client/tree/master/example
+See the tests for more examples.
+
+```http
+https://github.com/shacoshe/network-client/tree/master/test
+```
 
 ### Running tests
-    
-    npx mocha --full-trace --exit
+
+```shell
+npx mocha --exit
+```
+
+Running a sample of tests on the browser, run a simple node server
+
+```shell
+cd test/web
+node index.js
+```
+
+Open the browser and navigate to 
+
+```http
+http://localhost:8080/
+```
+
+
 
 ## Contributing
 
@@ -32,14 +51,15 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) file for details
 
-
 # Instructions
 
 
-# Global Request headers
 
-First, we will configure Network Client to set the headers the are important to us 
 
+
+
+## Global Request headers
+Supported headers values are String, Array and Function
 ```javascript
 var NetworkClient = require("network-client");
 var Network = new NetworkClient();
@@ -47,13 +67,7 @@ var Network = new NetworkClient();
 Network.addRequestHeader("Cache-control", ["no-cache", "no-store"]);
 Network.addRequestHeader("Pragma", "no-cache");
 Network.addRequestHeader("Expires", "0");
-...
-Network.removeRequestHeader("some-header");
-```
 
-we can also add conditional headers 
-
-```javascript
 var tokenElement = document.getElementsByName("csrfmiddlewaretoken")
 if(tokenElement && tokenElement.length > 0) {
     var checkCsrfHeader = function(method, url, data, contentType) {
@@ -64,23 +78,28 @@ if(tokenElement && tokenElement.length > 0) {
     }
     Network.addRequestHeader("X-CSRFToken", checkCsrfHeader);
 }
+
+...
+
+Network.removeRequestHeader("some-header");
 ```
 
-# Promise Support
 
-By default, NetwokrClient will use the native Promise object.   
-in cases where native Promise is not available, you can tell NetworkClient what is you Promise object.
- 
+
+## Promise Support
+
+By default, NetwokrClient is using the native Promise object.
+in cases where native Promise is not available, NetworkClient can be told what is the Promise object.
+
 ```javascript
 Network.setPromise(MyPromiseObject);
 ```
 
-# Network Events
 
-NetworkClient allows us to be notified about API calls `start`, `end` and `error`.   
-By creating a `new NetworkClient.NetworkListener` object we can register it to NetworkClient    
 
-### Creating a new "NetworkListener 
+## Network Events
+
+NetworkClient can notify `NetworkClient.NetworkListener` event listeners on API calls such as `start`, `end`, `error` And when `storage` is used.    
 
 ```javascript
 var netowrkListener = new NetworkClient.NetworkListener({
@@ -107,50 +126,152 @@ Network.removeNetworkListener(networkListener);
 ```
 
 
-# Request Options
 
-Any request can be configured individually if no configuration options were specified the default options are used.   
-options are represented as a JSON object and can be overridden in the following manner 
+## Request Configuration
+
+The configuration is a simple JSON object that can be used globally for all requests, And for an individual request. When no configuration specified the default config object is used.  
+
+Global configuration can be set at the creation of NetwortClient. (see next example for specific request configuration.) 
 
 ```javascript 
-Network = new NetworkClient({"json": true, "retries": 0, "backOffFactor": 0, "store": false, ...});
+Network = new NetworkClient({"json": true, ..});
 ```
 
 Available options are
 
-* `json` true/false indicating of the request should be send as a `json` or `form`. (default: `false`)
+* `baseURL` String suffix for the request URL,  (default: `""`)
+* `json` true/false. Indicating the request should be send as a `JSON` or `FORM` (`encodeURIComponent` string) . (default: `false`)
 * `headers` additional to  `addRequestHeader/removeRequestHeader`. (default: `{}`)
-* `retries` number of retires if the request return with `status_code >= 300 and status_code != 304`. (default: `0`)
-* `backOffFactor` number of milli seconds between each retry. (default: `0`)
-* `store` true/false when a request is successful the result will be stored. (all method types can be stored)     
-         calling another request with the same methods, url, params will cause fetching the last stored result. (default: `false`)  
-* `storeExpiration` have 3 options that control how much time results are stored. 
+* `retries` number of retires in case when the request return with `status_code == 0 OR status_code == 408`. (default: `0`)
+* `backOffFactor` number of milliseconds between each retry. (default: `0`)
+* `store` true/false. When a request is successful the result will be stored.  Calling another request with the same methods, URL And parameters will cause get the last stored result. (all `METHOD` types will be store when data is returned) (default: `false`)  
+* `storeExpiration` have 3 options that control for how long results are stored.  (default: `0`).
     * `undefined` never expires, will use `localStorage` if available, otherwise will use a polyfill that will expire on reload.
-    * `0` expires on reload (default option)
+    * `0` expires on reload 
     * `123..` time in milliseconds     
 
 
 
-### Declaring Modules
+## Modules
 
-Modules are a greate way to group REST operation, make seperation of concerns and add load them only when needed.
+Modules are a great way to group REST operation, make separation of concerns And load them only when needed.
+
+The module is a simple `javascript function` that accepts the instance of `NetworkClient` as the first parameter. The parameters following after it is passed by the code who registration of the module (see example).
+
+`NetowrkClient` instance expose functions to send HTTP request. with or without Promise support
+
+Available functions to send with promise support.
+
+```javascript
+network.get_promise(url/path, data, configutation)
+network.set_promise(url/path, data, configutation)
+network.put_promise(url/path, data, configutation)
+network.del_promise(url/path, data, configutation)
+network.use_promise(method, url/path, data, configutation)
+```
+
+
+```javascript
+network.get(url/path, data, configutation, success, error)
+network.set(url/path, data, configutation, success, error)
+network.put(url/path, data, configutation, success, error)
+network.del(url/path, data, configutation, success, error)
+network.use(method, url/path, data, configutation, success, error)
+```
+
+
+When sending a `GET` request the data automatically be sent in the URL
+
+
+
 
 ###### networkItem.js
 ```javascript
-Network.registerModule('item', function(network, additionalData) {
-    var options = {};
-	return {
-		get: function(item_id, success, error) {
-			return network.get_promise('api/item/' + item_id);
-		},
-		set: function(item_id, data, success, error) {
-			return network.post_promise('api/item/' + item_id, data);
-		}
-	};
-});
+var moduleItems = function(network, additionaArgument1, additionaArgument2) {
+   return {
+      get: function(item_id) {
+         return network.get_promise('api/item/' + item_id);
+      },
+      set: function(item_id, data) {
+         return network.post_promise('api/item/' + item_id, data);
+      }
+   };
+}
 ```
 
+After the module is registered we can call it in the following why
+
 ```javascript
+var arg1 = ...., arg2 = ...;
+Network.registerModule('items', moduleItems, arg1, arg2);
+
 Network.item.get(1);
 Network.item.set(2, {'x':'y'});
 ```
+
+### Declaring Modules Using callbacks
+
+###### networkPosts.js
+
+```javascript
+var modulePosts = function(network) {
+   return {
+      get: function(post_id, success, error) {
+         return network.get('api/posts/' + item_id, {}, {}, function(data) {
+                                                           ... process the data
+                                                           var proccesedData= ...
+                                                           success(proccesedData);
+                                                       }, error);
+      },
+      create: function(data, success, error) {
+         return network.post('api/posts', data, {}, success, error);
+
+      }
+   };
+}
+```
+
+And using the module
+
+```javascript
+Network.registerModule('posts', modulePosts);
+
+Network.posts.get(1, function(data) {
+                   ... do somthing 
+                });
+```
+
+
+### Declaring Modules With Configuration
+
+In case we will fetch information that is large and may not change we can store it in browser
+
+###### networkDetails.js
+
+```javascript
+var moduleDetails = function(network, additionaArgument1) {
+   return {
+      get: function(data_id) {
+            var config = {
+                retries: 3, // Try to fetch data 3 times.
+                backOffFactor: 505, // Wait 505 miliseconds between requests.
+                store: true, // Store the returned data.
+                storeExpiration: undefined // Store in localstorage or fallback storage.
+            };
+         return network.get_promise('api/data/' + data_id, {}, config);
+      },
+   };
+}
+```
+
+And using the module
+
+```javascript
+Network.registerModule('details', moduleDetails, "additionaArgument1");
+
+var data = await Network.posts.get(1);
+```
+
+
+Thank You For Reading, You are a Star.
+<a class="github-button" href="https://github.com/shacoshe/network-client" data-icon="octicon-star" data-size="large" aria-label="Star shacoshe/network-client on GitHub">Star</a>

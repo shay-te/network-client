@@ -1,4 +1,4 @@
-module.exports = function(network, params) {
+var networkPosts = function(network) {
 
     function buildUrl(postId) {
         var  url = "posts";
@@ -28,25 +28,41 @@ module.exports = function(network, params) {
             return network.del_promise(buildUrl(postId), data);
         },
 
+        getPostStore: function(postId) {
+            return network.get_promise(buildUrl(postId), {}, {store: true});
+        },
+
         allCB: function(success, error) {
-            network.get_promise(buildUrl(), {}, {}, success, error);
+            network.get(buildUrl(), {}, {}, success, error);
         },
 
         createCB: function(userId, title, body, success, error) {
             var data =  {userId: userId, title: title, body: body};
-            network.post_promise(buildUrl(), data, {}, success, error);
+            network.post(buildUrl(), data, {}, success, error);
         },
 
         getCB: function(postId, success, error) {
-            network.get_promise(buildUrl(postId), {}, {}, success, error);
+            network.get(buildUrl(postId), {}, {}, success, error);
+        },
+
+        getCDStore: function(postId, success, error) {
+            network.get(buildUrl(postId), {}, {'store': true}, success, error);
         },
 
         updateCB: function(postId, data, success, error) {
-            network.put_promise(buildUrl(postId), data, {}, success, error);
+            network.put(buildUrl(postId), data, {}, success, error);
         },
 
         deleteCB: function(postId, success, error) {
             return network.del(buildUrl(postId), {}, {}, success, error);
-        }
+        },
+
+        getUse: function(postId) {
+            return network.use_promise("POST", buildUrl(postId));
+        },
     };
 };
+
+if(typeof process !== 'undefined' && process.versions != null && process.versions.node != null) {
+    module.exports = networkPosts;
+}

@@ -1,4 +1,4 @@
-module.exports = function(network, port) {
+var networkTest = function(network, port) {
     return {
         ding: function() {
             return network.post_promise('ding');
@@ -27,3 +27,7 @@ module.exports = function(network, port) {
 
     };
 };
+
+if(typeof process !== 'undefined' && process.versions != null && process.versions.node != null) {
+    module.exports = networkTest;
+}

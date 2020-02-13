@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+
+    <script src="modules/networkPost.js" ></script>
+    <script src="NetworkClient.js" ></script>
+
+</head>
+<body>
+    <H1>Testing network client.</H1>
+    <H2 id="test-result">...</H2>
+
+
+    <script>
+        if (typeof console === "undefined") { console.log = function() {}; }
+        var Network = new NetworkClient();
+
+        var networkStartCalled = 0, networkEndCalled = 0, networkErrorCalled = 0, networkStorageCalled = 0;
+        var networkListener = new Network.NetworkListener({
+            networkStart: function(method, url, data, options) {
+                networkStartCalled++;
+            },
+            networkEnd: function(method, url, data, options) {
+                networkEndCalled++;
+            },
+            networkError: function(method, url, data, options) {
+                networkErrorCalled++;
+            },
+            networkStorage: function(method, url, data, options) {
+                networkStorageCalled++;
+            }
+        });
+        Network.addNetworkListener(networkListener);
+
+        Network.registerModule("posts", networkPosts);
+        //Network.posts.getCB(1, function(postData) {
+//            //console.log(postData);
+  //      });
+
+        console.log("Getting post and storing result, check console log for 1 network request");
+        for(var i = 0 ; i < 5 ; i++) {
+            setTimeout(function() {
+                Network.posts.getCDStore(1, function(postData) {
+                    //console.log(postData);
+                });
+            }, i*70);
+        }
+
+        setTimeout(function() {
+            console.log("networkStartCalled:" + networkStartCalled);
+            console.log("networkEndCalled:" + networkEndCalled);
+            console.log("networkErrorCalled:" + networkErrorCalled);
+            console.log("networkStorageCalled:" + networkStorageCalled);
+
+            var result = "";
+            var element = document.getElementById("test-result");
+            if(networkStartCalled == 1 && networkEndCalled == 1 && networkErrorCalled == 0 && networkStorageCalled == 4) {
+                element.style.color = "green";
+                element.innerHTML = "Test pass, yayy!";
+            } else {
+                element.style.color = "red";
+                element.innerHTML =  "Test failed, check for console log.";
+            }
+
+        }, 700);
+
+    </script>
+</body>
+</html>

@@ -1,6 +1,8 @@
 var restify = require('restify');
 var errors  = require('restify-errors');
 var path = require('path');
+var fs = require("fs");
+var posts = JSON.parse( fs.readFileSync(path.join(__dirname, "posts.json")) );
 
 var server_name = 'web_server';
 var server_version = '1.0.0';
@@ -23,6 +25,8 @@ function handleError(next, error) {
     }
     return next(renderError(error.message));
 }
+
+
 
 
 let dropConnectionCount = 0;
@@ -86,6 +90,35 @@ server.post('/post_info_params_form',
                 }
             });
 
+
+server.get('/posts/:id', (req, res, next) =>{
+    let postId = req.params.id;
+    if(posts[postId]) {
+        res.send(posts[postId]);
+    } else {
+        return next(new errors.NotFoundError('post by id not found'));
+    }
+});
+
+server.get('/posts', (req, res, next) =>{
+    res.send(posts);
+});
+
+
+server.get('/', restify.plugins.serveStatic({
+  directory: __dirname,
+  default: 'index.html'
+}));
+
+server.get('/NetworkClient.js', restify.plugins.serveStatic({
+  directory: path.join(__dirname, '../../', 'lib'),
+  default: 'NetworkClient.js'
+}));
+
+server.get('/modules/*', restify.plugins.serveStatic({
+  directory: path.join(__dirname, '../', 'networkModules'),
+  appendRequestPath: false
+}));
 
 
 console.log('WEB Server starting')
