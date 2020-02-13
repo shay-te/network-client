@@ -10,13 +10,9 @@ it has no dependencies and written to support old browsers like IE8.
 npm install network-client
 ```
 
-### Example
+### Examples
 
-See the tests for more examples.
-
-```http
-https://github.com/shacoshe/network-client/tree/master/test
-```
+[https://github.com/shacoshe/network-client/tree/master/test](https://github.com/shacoshe/network-client/tree/master/test)
 
 ### Running tests
 
@@ -24,26 +20,24 @@ https://github.com/shacoshe/network-client/tree/master/test
 npx mocha --exit
 ```
 
-Running a sample of tests on the browser, run a simple node server
+### Running In The Browser
+
+These are only basic functionalities tests.
 
 ```shell
 cd test/web
 node index.js
 ```
 
-Open the browser and navigate to 
-
-```http
-http://localhost:8080/
-```
+Open the WEB Browser and navigate to [http://localhost:8080/](http://localhost:8080/)
 
 
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for more details on our code of conduct, and the process for submitting pull requests to us.
 
-## Authors
+## Contributors
 
 **Shay Tessler**  - [github](https://github.com/shacoshe)
 
@@ -55,11 +49,9 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) f
 
 
 
-
-
-
 ## Global Request headers
-Supported headers values are String, Array and Function
+
+Supported headers values are `String`, `Array` and `Function`.
 ```javascript
 var NetworkClient = require("network-client");
 var Network = new NetworkClient();
@@ -88,8 +80,8 @@ Network.removeRequestHeader("some-header");
 
 ## Promise Support
 
-By default, NetwokrClient is using the native Promise object.
-in cases where native Promise is not available, NetworkClient can be told what is the Promise object.
+By default, `NetwokrClient` is using the native `Promise` object.
+in cases where native `Promise` is not available, `NetworkClient` can be told what is the Promise object.
 
 ```javascript
 Network.setPromise(MyPromiseObject);
@@ -99,7 +91,7 @@ Network.setPromise(MyPromiseObject);
 
 ## Network Events
 
-NetworkClient can notify `NetworkClient.NetworkListener` event listeners on API calls such as `start`, `end`, `error` And when `storage` is used.    
+`NetworkClient` can notify `NetworkClient.NetworkListener` event listener on API calls such as `start`, `end`, `error` And when `storage` is used.    
 
 ```javascript
 var netowrkListener = new NetworkClient.NetworkListener({
@@ -131,61 +123,65 @@ Network.removeNetworkListener(networkListener);
 
 The configuration is a simple JSON object that can be used globally for all requests, And for an individual request. When no configuration specified the default config object is used.  
 
-Global configuration can be set at the creation of NetwortClient. (see next example for specific request configuration.) 
+Global configuration can be set at the creation of `NetwortClient`. For example:
 
 ```javascript 
 Network = new NetworkClient({"json": true, ..});
 ```
 
-Available options are
+#### Available Options
 
-* `baseURL` String suffix for the request URL,  (default: `""`)
-* `json` true/false. Indicating the request should be send as a `JSON` or `FORM` (`encodeURIComponent` string) . (default: `false`)
-* `headers` additional to  `addRequestHeader/removeRequestHeader`. (default: `{}`)
-* `retries` number of retires in case when the request return with `status_code == 0 OR status_code == 408`. (default: `0`)
-* `backOffFactor` number of milliseconds between each retry. (default: `0`)
-* `store` true/false. When a request is successful the result will be stored.  Calling another request with the same methods, URL And parameters will cause get the last stored result. (all `METHOD` types will be store when data is returned) (default: `false`)  
-* `storeExpiration` have 3 options that control for how long results are stored.  (default: `0`).
-    * `undefined` never expires, will use `localStorage` if available, otherwise will use a polyfill that will expire on reload.
+* `baseURL` String suffix for the request URL,  (type: `string`, default: `""`)
+* `json` Indicating the request should be send as a `JSON` or `FORM` (`encodeURIComponent` string) . (type: `boolean`, default: `false`)
+* `headers` Additional to  `addRequestHeader/removeRequestHeader`. (type: `object`, default: `{}`)
+* `retries` Number of retires in case when the request return with `status_code == 0 OR status_code == 408`. (type: `number`, default: `0`)
+* `backOffFactor` Number of milliseconds between each retry. (type: `number`, default: `0`)
+* `store`. When a request is successful the result will be stored.  Calling to another request with the same methods, URL And parameters will get the last stored result. Without sending any request to the server. (All `METHOD` types will be store the return data.) (type: `boolean`, default: `false`)  
+* `storeExpiration` have 3 options that control for how long results are stored.  (type: `number`,default: `0`).
+    * `undefined` never expires, will use `localStorage` if available, otherwise will use a "polyfill" that will expire on reload.
     * `0` expires on reload 
-    * `123..` time in milliseconds     
+    * `123..` time in milliseconds  
 
 
 
 ## Modules
 
-Modules are a great way to group REST operation, make separation of concerns And load them only when needed.
+Modules are a great way to group REST operation, make separation of concerns And load them only when they are needed.
 
-The module is a simple `javascript function` that accepts the instance of `NetworkClient` as the first parameter. The parameters following after it is passed by the code who registration of the module (see example).
+The module is a simple `javascript` `function` that accepts an instance of `NetworkClient` for it's first parameter. 
+`NetowrkClient` instance expose functions to send HTTP request. with or without Promise.
 
-`NetowrkClient` instance expose functions to send HTTP request. with or without Promise support
-
-Available functions to send with promise support.
+Available functions to send a request with `Promise`
 
 ```javascript
-network.get_promise(url/path, data, configutation)
-network.set_promise(url/path, data, configutation)
-network.put_promise(url/path, data, configutation)
-network.del_promise(url/path, data, configutation)
-network.use_promise(method, url/path, data, configutation)
+var network = new NetworkClient();
+network.get_promise(path, data, configutation)
+network.set_promise(path, data, configutation)
+network.put_promise(path, data, configutation)
+network.del_promise(path, data, configutation)
+network.use_promise(method, path, data, configutation)
+```
+
+Available functions to send a request with the traditional `success` And `error` callback
+```javascript
+var network = new NetworkClient();
+network.get(path, data, configutation, success, error)
+network.set(path, data, configutation, success, error)
+network.put(path, data, configutation, success, error)
+network.del(path, data, configutation, success, error)
+network.use(method, path, data, configutation, success, error)
 ```
 
 
-```javascript
-network.get(url/path, data, configutation, success, error)
-network.set(url/path, data, configutation, success, error)
-network.put(url/path, data, configutation, success, error)
-network.del(url/path, data, configutation, success, error)
-network.use(method, url/path, data, configutation, success, error)
-```
 
-
-When sending a `GET` request the data automatically be sent in the URL
+> **NOTICE**: When sending a `GET` request. The request Data will be sent inside the URL as Query String parameters.
 
 
 
+## Examples
 
 ###### networkItem.js
+
 ```javascript
 var moduleItems = function(network, additionaArgument1, additionaArgument2) {
    return {
@@ -199,29 +195,35 @@ var moduleItems = function(network, additionaArgument1, additionaArgument2) {
 }
 ```
 
-After the module is registered we can call it in the following why
+After the module is registered we can call it in the following why.  
 
 ```javascript
-var arg1 = ...., arg2 = ...;
-Network.registerModule('items', moduleItems, arg1, arg2);
+var additionaArgument1 = ...., additionaArgument2 = ...;
+network.registerModule('items', moduleItems, additionaArgument1, additionaArgument2);
 
-Network.item.get(1);
-Network.item.set(2, {'x':'y'});
+await network.items.get(1);
+await network.items.set(2, {'x':'y'});
 ```
 
-### Declaring Modules Using callbacks
+
+
+### Declaring Modules Using Callbacks
 
 ###### networkPosts.js
 
 ```javascript
 var modulePosts = function(network) {
+    var proc_get = function(data, success) {
+        ... process the "data" into "proccesedData"
+        var proccesedData= ...
+        success(proccesedData);
+   }
+    
    return {
       get: function(post_id, success, error) {
-         return network.get('api/posts/' + item_id, {}, {}, function(data) {
-                                                           ... process the data
-                                                           var proccesedData= ...
-                                                           success(proccesedData);
-                                                       }, error);
+         return network.get('api/posts/' + item_id, {}, {}, 
+                            function(data){proc_get(data, success)}, 
+                            error);
       },
       create: function(data, success, error) {
          return network.post('api/posts', data, {}, success, error);
@@ -238,18 +240,19 @@ Network.registerModule('posts', modulePosts);
 
 Network.posts.get(1, function(data) {
                    ... do somthing 
-                });
+                 });
 ```
 
 
-### Declaring Modules With Configuration
+
+### Request With Configuration
 
 In case we will fetch information that is large and may not change we can store it in browser
 
 ###### networkDetails.js
 
 ```javascript
-var moduleDetails = function(network, additionaArgument1) {
+var moduleDetails = function(network) {
    return {
       get: function(data_id) {
             var config = {
@@ -267,11 +270,15 @@ var moduleDetails = function(network, additionaArgument1) {
 And using the module
 
 ```javascript
-Network.registerModule('details', moduleDetails, "additionaArgument1");
+Network.registerModule('details', moduleDetails);
 
 var data = await Network.posts.get(1);
 ```
 
 
-Thank You For Reading, You are a Star.
-<a class="github-button" href="https://github.com/shacoshe/network-client" data-icon="octicon-star" data-size="large" aria-label="Star shacoshe/network-client on GitHub">Star</a>
+
+
+
+### Thank You For Reading !.
+### You Are a Star.    
+(If you like this project please star it) 

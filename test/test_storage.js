@@ -10,7 +10,8 @@ var Network = new NetworkClient({baseURL: "https://jsonplaceholder.typicode.com/
 
 describe("Validate storage work properly", function() {
     it("Validate build storage key", function() {
-        assert.equal(Network._build_store_key(Network.HttpMethod.PUT, "i_am_the_s   url", {"username": "shastalka", "password": "swhastword"}), "put-i_am_the_surl-username=shastalka&password=swhastword");
+        // Test with different order of keys, creates ordered parameters in the url
+        assert.equal(Network._build_store_key(Network.HttpMethod.PUT, "i_am_the_s   url", {"username": "shastalka", "password": "swhastword"}), "put-i_am_the_surl-password=swhastword&username=shastalka");
         assert.equal(Network._build_store_key(Network.HttpMethod.PUT, "/x                                      /\\asdakjsdaf;lkasdf\\"), "put-/x/#asdakjsdaf;lkasdf#-{}");
         expect(function() {Network._build_store_key();}).to.throw(TypeError);
         expect(function() {Network._build_store_key("", "");}).to.throw(TypeError);
