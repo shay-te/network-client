@@ -17,7 +17,7 @@ npm install network-client
 ### Running tests
 
 ```shell
-npx mocha --exit
+npx mocha
 ```
 
 ### Running In The Browser
@@ -141,6 +141,7 @@ Network = new NetworkClient({"json": true, ..});
     * `undefined` never expires, will use `localStorage` if available, otherwise will use a "polyfill" that will expire on reload.
     * `0` expires on reload 
     * `123..` time in milliseconds  
+* `debug` Will print networks errors to `console.error` . (type: `boolean`, default: `false`)
 
 
 

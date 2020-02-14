@@ -7,7 +7,9 @@ let assert = require('chai').assert;
 
 let failCallback = function(err) {
     console.error(err);
+    console.trace();
     assert.fail("network error!");
+    throw err;
 }
 
 let validateAll = function(all) {

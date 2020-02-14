@@ -7,6 +7,7 @@ let Helpers = require('./utils/helpers.js');
 
 let failCallback = function(err) {
     console.error(err);
+    console.trace();
     assert.fail("network error!");
 }
 
@@ -15,11 +16,11 @@ describe("Validate options", function() {
     let server;
     before(function(done) {
         let port = 8901;
-        server = require('./utils/server.js');
+        server = require('./web/server.js');
         server.start(port);
 
         let NetworkClient = require("../lib/NetworkClient.js");
-        Network = new NetworkClient({baseURL: "http://127.0.0.1:" + port + "/"});
+        Network = new NetworkClient({baseURL: "http://127.0.0.1:" + port + "/", debug: true});
         Network.registerModule("test", require("./networkModules/networkTest.js"), port);
         done();
     });

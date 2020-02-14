@@ -90,8 +90,27 @@ server.post('/post_info_params_form',
                 }
             });
 
+function getMaxId() {
+    let max = 0;
+    Object.keys(posts).forEach(function(key) {
+        let maxKey = parseInt(key)
+        if(maxKey > max) {max = maxKey;}
+    });
+    return max + 1;
+}
 
-server.get('/posts/:id', (req, res, next) =>{
+// Create
+server.post('/items', (req, res, next) =>{
+    let maxId = getMaxId();
+    posts[maxId]  = req.body;
+    posts[maxId].comments = [];
+});
+// Update
+server.post('/items/:id', (req, res, next) =>{
+    posts[req.params.id] = Object.assign(posts[req.params.id], req.body);
+});
+
+server.get('/items/:id', (req, res, next) =>{
     let postId = req.params.id;
     if(posts[postId]) {
         res.send(posts[postId]);
@@ -119,7 +138,6 @@ server.get('/modules/*', restify.plugins.serveStatic({
   directory: path.join(__dirname, '../', 'networkModules'),
   appendRequestPath: false
 }));
-
 
 console.log('WEB Server starting')
 var WEBServer = {
