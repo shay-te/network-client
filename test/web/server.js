@@ -99,29 +99,40 @@ function getMaxId() {
     return max + 1;
 }
 
-// Create
-server.post('/items', (req, res, next) =>{
-    let maxId = getMaxId();
-    posts[maxId]  = req.body;
-    posts[maxId].comments = [];
-});
-// Update
-server.post('/items/:id', (req, res, next) =>{
-    posts[req.params.id] = Object.assign(posts[req.params.id], req.body);
-});
 
-server.get('/items/:id', (req, res, next) =>{
-    let postId = req.params.id;
-    if(posts[postId]) {
-        res.send(posts[postId]);
-    } else {
-        return next(new errors.NotFoundError('post by id not found'));
-    }
-});
+let BlogData = require('./blogData.js');
 
+server.post('/posts', (req, res, next) =>{
+    res.send(BlogData.addPost(req.body));
+});
+server.put('/posts/:id', (req, res, next) =>{
+    BlogData.updatePost(req.params.id, req.body));
+    res.status(204);
+});
+server.get('/posts/:id', (req, res, next) =>{
+    res.send(BlogData.getPost(req.params.id));
+});
+server.delete('/posts/:id', (req, res, next) =>{
+    res.send(BlogData.deletePost(req.params.id));
+});
 server.get('/posts', (req, res, next) =>{
-    res.send(posts);
+    res.send(BlogData.getPosts());
 });
+
+server.post('/posts/comment', (req, res, next) =>{
+    res.send(BlogData.addComment(req.params.postId, req.body));
+});
+server.put('/posts/:postId/comment/:commentId', (req, res, next) =>{
+    BlogData.updateComment(req.params.postId, req.params.commentId, req.body));
+    res.status(204);
+});
+server.get('/posts/:postId/comment/:commentId', (req, res, next) =>{
+    res.send(BlogData.getComment(req.params.postId, req.params.commentId));
+});
+server.delete('/posts/:postId/comment/:commentId', (req, res, next) =>{
+    res.send(BlogData.deleteComment(req.params.postId, req.params.commentId)));
+});
+
 
 
 server.get('/', restify.plugins.serveStatic({
