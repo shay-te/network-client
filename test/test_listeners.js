@@ -8,10 +8,11 @@ let Helpers = require('./utils/helpers.js');
 
 describe('Validate listeners are called', function() {
     let Network;
+    let server;
 
     let validatePostAll = function(method, url, data, options) {
         assert.equal(method, Network.HttpMethod.GET);
-        assert.equal(url, "https://jsonplaceholder.typicode.com/posts");
+        assert.equal(url, "http://127.0.0.1:8901/posts");
         assert.deepEqual(data, {});
         assert.equal(options['store'], false);
         assert.equal(options['storeExpiration'], 0);
@@ -19,7 +20,7 @@ describe('Validate listeners are called', function() {
 
     let validatePostGet = function(method, url, data, options) {
         assert.equal(method, Network.HttpMethod.GET);
-        assert.equal(/^https:\/\/jsonplaceholder.typicode.com\/posts\/\d+$/.test(url), true);
+        assert.equal(/^http:\/\/127.0.0.1:8901\/posts\/\d+$/.test(url), true);
         assert.deepEqual(data, {});
         assert.equal(options['store'], false);
         assert.equal(options['storeExpiration'], 0);
@@ -27,19 +28,29 @@ describe('Validate listeners are called', function() {
 
     let validatePostGetStore = function(method, url, data, options) {
         assert.equal(method, Network.HttpMethod.GET);
-        assert.equal(/^https:\/\/jsonplaceholder.typicode.com\/posts\/\d+$/.test(url), true);
+        assert.equal(/^https:\/\/127.0.0.1:8901\/posts\/\d+$/.test(url), true);
         assert.deepEqual(data, {});
         assert.equal(options['store'], true);
         assert.equal(options['storeExpiration'], 0);
     }
     before(function(done) {
+        let port = 8901;
+        server = require('./web/server.js');
+        server.start(port);
+
         let NetworkClient = require("../lib/NetworkClient.js");
 
-        Network = new NetworkClient({baseURL: "https://jsonplaceholder.typicode.com/"});
+        Network = new NetworkClient({baseURL: "http://127.0.0.1:" + port + "/", json: true, debug: true});
 
         Network.registerModule("posts", require("./networkModules/networkPost.js"));
         Network.registerModule("comments", require("./networkModules/networkComment.js"));
         done();
+    });
+
+
+    after(function(done) {
+        server.stop();
+        done()
     });
 
     it('should return -1 when the value is not present', async function() {

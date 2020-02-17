@@ -2,7 +2,6 @@ var restify = require('restify');
 var errors  = require('restify-errors');
 var path = require('path');
 var fs = require("fs");
-var posts = JSON.parse( fs.readFileSync(path.join(__dirname, "posts.json")) );
 
 var server_name = 'web_server';
 var server_version = '1.0.0';
@@ -25,7 +24,6 @@ function handleError(next, error) {
     }
     return next(renderError(error.message));
 }
-
 
 
 
@@ -90,48 +88,66 @@ server.post('/post_info_params_form',
                 }
             });
 
-function getMaxId() {
-    let max = 0;
-    Object.keys(posts).forEach(function(key) {
-        let maxKey = parseInt(key)
-        if(maxKey > max) {max = maxKey;}
-    });
-    return max + 1;
-}
+/**
+ *
+ * POST COMMENTS
+ */
 
+let DataError = require('./DataError.js');
 
 let BlogData = require('./blogData.js');
 
-server.post('/posts', (req, res, next) =>{
-    res.send(BlogData.addPost(req.body));
-});
-server.put('/posts/:id', (req, res, next) =>{
-    BlogData.updatePost(req.params.id, req.body));
-    res.status(204);
-});
-server.get('/posts/:id', (req, res, next) =>{
-    res.send(BlogData.getPost(req.params.id));
-});
-server.delete('/posts/:id', (req, res, next) =>{
-    res.send(BlogData.deletePost(req.params.id));
-});
-server.get('/posts', (req, res, next) =>{
-    res.send(BlogData.getPosts());
-});
+function catchErrors(callback) {
+  return async function errorHandler(req, res, next) {
+    try {
+      await callback(req, res, next)
+    } catch (err) {
+//        console.error(err);
+        if(err instanceof DataError) {
+            res.status(err.status);
+            res.send({"error": err.message});
+        } else {
+            next(new errors.InternalServerError(err));
+        }
+    }
+  }
+}
 
-server.post('/posts/comment', (req, res, next) =>{
-    res.send(BlogData.addComment(req.params.postId, req.body));
-});
-server.put('/posts/:postId/comment/:commentId', (req, res, next) =>{
-    BlogData.updateComment(req.params.postId, req.params.commentId, req.body));
+
+server.get('/posts', catchErrors(async (req, res, next) => {
+    res.send(BlogData.allPosts());
+}));
+
+server.post('/posts', catchErrors(async (req, res, next) => {
+    res.send({id: BlogData.addPost(JSON.parse(req.body))});
+}));
+server.put('/posts/:id', catchErrors(async (req, res, next) => {
+    BlogData.updatePost(req.params.id, JSON.parse(req.body));
     res.status(204);
-});
-server.get('/posts/:postId/comment/:commentId', (req, res, next) =>{
+    res.send(renderMessage('ok'));
+}));
+
+server.get('/posts/:id', catchErrors(async (req, res, next) => {
+    res.send(BlogData.getPost(req.params.id));
+}));
+server.del('/posts/:id', catchErrors(async (req, res, next) => {
+    res.send(BlogData.deletePost(req.params.id));
+}));
+
+server.post('/posts/:postId/comments', catchErrors(async (req, res, next) => {
+    res.send({id: BlogData.addComment(req.params.postId, JSON.parse(req.body))});
+}));
+server.put('/posts/:postId/comments/:commentId', catchErrors(async (req, res, next) => {
+    BlogData.updateComment(req.params.postId, req.params.commentId, JSON.parse(req.body));
+    res.status(204);
+    res.send(renderMessage('ok'));
+}));
+server.get('/posts/:postId/comments/:commentId', catchErrors(async (req, res, next) => {
     res.send(BlogData.getComment(req.params.postId, req.params.commentId));
-});
-server.delete('/posts/:postId/comment/:commentId', (req, res, next) =>{
-    res.send(BlogData.deleteComment(req.params.postId, req.params.commentId)));
-});
+}));
+server.del('/posts/:postId/comments/:commentId', catchErrors(async (req, res, next) => {
+    res.send(BlogData.deleteComment(req.params.postId, req.params.commentId));
+}));
 
 
 
@@ -150,9 +166,9 @@ server.get('/modules/*', restify.plugins.serveStatic({
   appendRequestPath: false
 }));
 
-console.log('WEB Server starting')
 var WEBServer = {
     start: function(port) {
+        console.log('WEB Server starting')
         server.listen(port, '127.0.0.1', function () {
             console.log('%s listening at %s' , server.name, server.url);
         });

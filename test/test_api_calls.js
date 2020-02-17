@@ -18,8 +18,7 @@ let validateAll = function(all) {
     expect(all.length).to.be.above(1);
 }
 
-let validateCreateUpdate = function(post) {
-    postId = post["id"];
+let validateCreate = function(post) {
     assert.notEqual(post, undefined);
     assert.equal(typeof(post), "object");
 }
@@ -27,71 +26,86 @@ let validateCreateUpdate = function(post) {
 let validateGet = function(post) {
     assert.notEqual(post, undefined);
     assert.equal(typeof(post), "object");
-    assert.equal(post.id, 1);
     assert.notEqual(post.title, undefined);
-    assert.notEqual(post.body, undefined);
+    assert.notEqual(post.content, undefined);
 }
 
-let validateDelete = function(post) {
-    assert.notEqual(post, undefined);
-}
 
 describe("Validate all requests are returning", function() {
     let Network;
+    let server;
     before(function(done) {
+        let port = 8901;
+        server = require('./web/server.js');
+        server.start(port);
+
         let NetworkClient = require("../lib/NetworkClient.js");
-        Network = new NetworkClient({baseURL: "https://jsonplaceholder.typicode.com/"});
+        Network = new NetworkClient({baseURL: "http://127.0.0.1:" + port + "/", json: true, debug: true});
 
         Network.registerModule("posts", require("./networkModules/networkPost.js"));
         Network.registerModule("comments", require("./networkModules/networkComment.js"));
         done();
     });
 
-    it("Run all requests types promise", function() {
+    after(function(done) {
+        server.stop();
+        done()
+    });
+
+    it("1 Run all requests types promise", async function() {
+        for(var i = 0 ; i < 5 ; i++) {
+            let post = await Network.posts.create("post title" ,"post body");
+            validateCreate(post)
+        }
+
         Network.posts.all()
             .then(function(all) {validateAll(all)})
-            .catch(failCallback);
-
-        Network.posts.create(1, "post title" ,"post body")
-            .then(function(post){validateCreateUpdate(post)})
             .catch(failCallback);
 
         Network.posts.get(1)
             .then(function(post){validateGet(post);})
             .catch(failCallback);
 
-        Network.posts.update(1, {"title": "one title", "body": "one body"})
-            .then(function(post){validateCreateUpdate(post)})
-            .catch(failCallback);
+        let updateTitle = "one title1";
+        let updateContent = "one body1";
+        await Network.posts.update(1, {"title": updateTitle, "content": updateContent});
+        let post = await Network.posts.get(1);
+        assert.equal(post.title, updateTitle);
+        assert.equal(post.content, updateContent);
 
-        Network.posts.delete(1)
-            .then(function(post){validateDelete(post);})
-            .catch(failCallback);
+        await Network.posts.del(1);
 
-        Network.posts.getUse(1)
-            .then(function(post){validateGet(post);})
-            .catch(failCallback);
+        try {
+            await Network.posts.get(1);
+            assert.fail("Should not be exists");
+        }catch(e) {}
     });
 
-    it("Run all requests types callback", function() {
-        Network.posts.allCB(
-            function(all) {validateAll(all)},
-            failCallback);
+    it("2 Run all requests types callback", function(done) {
+        Network.posts.createCB("post title" ,"post body",
+            function(post){
+                validateCreate(post)
+                Network.posts.allCB(
+                    function(all) {
+                        validateAll(all)
+                        Network.posts.getCB(2,
+                            function(post){
+                                validateGet(post);
 
-        Network.posts.createCB(1, "post title" ,"post body",
-            function(post){validateCreateUpdate(post)},
-            failCallback);
-
-        Network.posts.getCB(1,
-            function(post){validateGet(post);},
-            failCallback);
-
-        Network.posts.updateCB(1, {"title": "one title", "body": "one body"},
-            function(post){validateCreateUpdate(post)},
-            failCallback);
-
-        Network.posts.deleteCB(1,
-            function(post){validateDelete(post);},
+                                    Network.posts.updateCB(2, {"title": "one title", "body": "one body"},
+                                        function(){
+                                            Network.posts.deleteCB(2,
+                                                function(post){
+                                                    done();
+                                                },
+                                                failCallback);
+                                        },
+                                        failCallback);
+                            },
+                            failCallback);
+                    },
+                    failCallback);
+            },
             failCallback);
     });
 });

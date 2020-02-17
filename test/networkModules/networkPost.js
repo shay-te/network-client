@@ -11,8 +11,8 @@ var networkPosts = function(network) {
             return network.get_promise(buildUrl(), {});
         },
 
-        create: function(userId, title, body) {
-            var data =  {userId: userId, title: title, body: body};
+        create: function(title, content) {
+            var data =  {title: title, content: content};
             return network.post_promise(buildUrl(), data);
         },
 
@@ -24,7 +24,7 @@ var networkPosts = function(network) {
             return network.put_promise(buildUrl(postId), data);
         },
 
-        "delete": function(postId, data) {
+        del: function(postId, data) {
             return network.del_promise(buildUrl(postId), data);
         },
 
@@ -36,8 +36,8 @@ var networkPosts = function(network) {
             network.get(buildUrl(), {}, {}, success, error);
         },
 
-        createCB: function(userId, title, body, success, error) {
-            var data =  {userId: userId, title: title, body: body};
+        createCB: function(title, content, success, error) {
+            var data =  {title: title, content: content};
             network.post(buildUrl(), data, {}, success, error);
         },
 

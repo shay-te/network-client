@@ -12,26 +12,26 @@ let prepareData = function(data, fields) {
 }
 
 
-class DataError extends Error {
-  constructor(status, message) {
-    super(message);
-    this.status = status;
-  }
-}
+let DataError = require('./DataError.js');
 
 
-module.exports {
+module.exports = {
     posts: {},
     comments: {},
     postsToComments: {},
     maxPostId: 0,
     maxCommentId: 0,
 
+    allPosts: function() {
+        return Object.values(this.posts);
+    },
     addPost: function(data) {
+        this._validateData(data);
         this.maxPostId++;
-        this.posts[this.maxPostId] = prepareData(data, postFields);
+        let postId = this.maxPostId;
+        this.posts[postId] = prepareData(data, postFields);
         this.postsToComments[postId] = [];
-        return this.maxPostId;
+        return postId;
     },
     deletePost: function(postId) {
         this._validatePostExists(postId);
@@ -39,6 +39,7 @@ module.exports {
         delete this.postsToComments[postId]
     },
     updatePost: function(postId, data) {
+        this._validateData(data);
         this._validatePostExists(postId);
         this.posts[postId] = Object.assign(this.posts[postId], prepareData(data, postFields));
     },
@@ -46,15 +47,13 @@ module.exports {
         this._validatePostExists(postId);
         return this.posts[postId];
     },
-    getPosts: function() {
-        return this.posts;
-    },
 
     addComment: function(postId, data) {
+        this._validateData(data);
         this._validatePostExists(postId);
 
         this.maxCommentId++;
-        this.postsToComments.push(this.maxCommentId);
+        this.postsToComments[postId].push(this.maxCommentId);
         this.comments[this.maxCommentId] = prepareData(data, commentFields);
         return this.maxCommentId;
     },
@@ -64,19 +63,22 @@ module.exports {
         delete this.comments[commentId];
     },
     updateComment: function(postId, commentId, data) {
+        this._validateData(data);
         this._validateCommentExists(postId, commentId);
 
-        this.comments[commentId] = Object,assign(this.comments[commentId], prepareData(data, commentFields));
+        this.comments[commentId] = Object.assign(this.comments[commentId], prepareData(data, commentFields));
     },
     getComment: function(postId, commentId) {
         this._validateCommentExists(postId, commentId);
         return this.comments[commentId];
     },
-
-    _validatePostExists = function(postId) {
+    _validateData: function(data) {
+        if(!data || data.constructor !== Object) {throw new DataError(500, "Data must be set")}
+    },
+    _validatePostExists: function(postId) {
         if(!this.posts[postId]) {throw new DataError(404, "Not found")};
     },
-    _validateCommentExists = function(postId, commentId) {
+    _validateCommentExists: function(postId, commentId) {
         if(!this.posts[postId]) {throw new DataError(404, "Not found")};
         if(!this.comments[commentId] || this.postsToComments[postId].indexOf(commentId) != -1) {throw new DataError(404, "Not found")};
     },
