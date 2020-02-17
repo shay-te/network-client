@@ -56,6 +56,7 @@ Supported headers values are `String`, `Array` and `Function`.
 var NetworkClient = require("network-client");
 var Network = new NetworkClient();
 
+Network.addRequestHeader("Content-Type", "application/json");
 Network.addRequestHeader("Cache-control", ["no-cache", "no-store"]);
 Network.addRequestHeader("Pragma", "no-cache");
 Network.addRequestHeader("Expires", "0");
