@@ -16,7 +16,7 @@
 
     <script>
         if (typeof console === "undefined") { console.log = function() {}; }
-        var Network = new NetworkClient();
+        var Network = new NetworkClient({json: true, headers: {"Content-Type": "application/json"}});
 
         var networkStartCalled = 0, networkEndCalled = 0, networkErrorCalled = 0, networkStorageCalled = 0;
         var networkListener = new Network.NetworkListener({
@@ -36,17 +36,15 @@
         Network.addNetworkListener(networkListener);
 
         Network.registerModule("posts", networkPosts);
-        //Network.posts.getCB(1, function(postData) {
-//            //console.log(postData);
-  //      });
+        Network.posts.createCB("title", "content", function() {});
 
         console.log("Getting post and storing result, check console log for 1 network request");
         for(var i = 0 ; i < 5 ; i++) {
             setTimeout(function() {
                 Network.posts.getCDStore(1, function(postData) {
-                    //console.log(postData);
+                    console.log(postData);
                 });
-            }, i*70);
+            }, i*80);
         }
 
         setTimeout(function() {
@@ -57,15 +55,14 @@
 
             var result = "";
             var element = document.getElementById("test-result");
-            if(networkStartCalled == 1 && networkEndCalled == 1 && networkErrorCalled == 0 && networkStorageCalled == 4) {
+            if(networkStartCalled == 2 && networkEndCalled == 2 && networkErrorCalled == 0 && networkStorageCalled == 4) {
                 element.style.color = "green";
                 element.innerHTML = "Test pass, yayy!";
             } else {
                 element.style.color = "red";
                 element.innerHTML =  "Test failed, check for console log.";
             }
-
-        }, 700);
+        }, 800);
 
     </script>
 </body>

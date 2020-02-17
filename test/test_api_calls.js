@@ -41,6 +41,7 @@ describe("Validate all requests are returning", function() {
 
         let NetworkClient = require("../lib/NetworkClient.js");
         Network = new NetworkClient({baseURL: "http://127.0.0.1:" + port + "/", json: true, debug: true});
+        Network.addRequestHeader("Content-Type", "application/json");
 
         Network.registerModule("posts", require("./networkModules/networkPost.js"));
         Network.registerModule("comments", require("./networkModules/networkComment.js"));

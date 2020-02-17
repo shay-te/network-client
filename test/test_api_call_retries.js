@@ -14,27 +14,27 @@ let failCallback = function(err) {
 describe("Validate options", function() {
     let Network;
     let server;
-    before(function(done) {
+    before(function() {
         let port = 8901;
         server = require('./web/server.js');
         server.start(port);
 
         let NetworkClient = require("../lib/NetworkClient.js");
-        Network = new NetworkClient({baseURL: "http://127.0.0.1:" + port + "/", debug: true});
+        Network = new NetworkClient({baseURL: "http://127.0.0.1:" + port + "/", debug: true, json: true});
+        Network.addRequestHeader("Content-Type", "application/json");
+
         Network.registerModule("test", require("./networkModules/networkTest.js"), port);
-        done();
     });
 
-    after(function(done) {
+    after(function() {
         server.stop();
-        done()
     });
 
-    it("Validate basic request", async function() {
+    it("1 Validate basic request", async function() {
         await Network.test.ding();
     });
 
-    it("Drop connection retries", async function() {
+    it("2 Drop connection retries", async function() {
         this.timeout(3000);
         let backOffFactor = 100;
         let startTime = Date.now();
@@ -46,7 +46,7 @@ describe("Validate options", function() {
         expect(endTime-startTime).to.be.above(900);
     });
 
-    it("Timeout retries", async function() {
+    it("3 Timeout retries", async function() {
         let backOffFactor = 100;
         let startTime = Date.now();
         try {
@@ -57,7 +57,7 @@ describe("Validate options", function() {
         expect(endTime-startTime).to.be.above(900);
     });
 
-    it("Store expiration", async function() {
+    it("4 Store expiration", async function() {
         let storeExpiration = 1000;
         let info = await Network.test.get_info(storeExpiration);
         assert.equal(info, "info");
@@ -71,14 +71,8 @@ describe("Validate options", function() {
         assert.equal(info, "info");
     });
 
-    it("send json/form", async function() {
-        let form_res = await Network.test.post_info_params_form();
-        assert.equal(form_res, "ok");
-        let json_res = await Network.test.post_info_params_json();
-        assert.equal(json_res, "ok");
-    });
 
-    it("All tests stats", async function() {
+    it("5 All tests stats", async function() {
         let stats = await Network.test.get_stats();
         assert.equal(stats.dropConnectionCount, 10);
         assert.equal(stats.timeoutCount, 10);
@@ -89,6 +83,17 @@ describe("Validate options", function() {
         // 4. upload example
 
     });
+
+    it("5 send json/form", async function() {
+        let json_res = await Network.test.post_info_params_json();
+        assert.equal(json_res, "ok");
+
+
+        Network.removeRequestHeader("Content-Type");
+        let form_res = await Network.test.post_info_params_form();
+        assert.equal(form_res, "ok");
+    });
+
 });
 
 

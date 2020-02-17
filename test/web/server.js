@@ -1,11 +1,11 @@
-var restify = require('restify');
-var errors  = require('restify-errors');
-var path = require('path');
+var restify = require("restify");
+var errors  = require("restify-errors");
+var path = require("path");
 var fs = require("fs");
 
-var server_name = 'web_server';
-var server_version = '1.0.0';
-let querystring = require('querystring');
+var server_name = "web_server";
+var server_version = "1.0.0";
+let querystring = require("querystring");
 
 
 const server = restify.createServer({name: server_name, version: server_version});
@@ -16,9 +16,9 @@ server.use(restify.plugins.bodyParser({ mapParams: true }));
 server.use(restify.plugins.acceptParser(server.acceptable));
 
 function renderError(error) { return new errors.InternalError(error); }
-function renderMessage(msg) { return {'message': msg}; }
+function renderMessage(msg) { return {"message": msg}; }
 function handleError(next, error) {
-    console.error(error);
+//    console.error(error);
     if (error instanceof ReferenceError) {
         return next(new errors.BadRequestError(error.message));
     }
@@ -31,18 +31,18 @@ let dropConnectionCount = 0;
 let timeoutCount = 0;
 let get_info = 0;
 
-server.post('/ding',
+server.post("/ding",
             function (req, res, next) {
-                res.send(renderMessage('dong'));
+                res.send(renderMessage("dong"));
             });
 
-server.post('/clear_errors',
+server.post("/clear_errors",
             function (req, res, next) {
                 dropConnectionCount = 0;
                 next();
             });
 
-server.get('/get_stats',
+server.get("/get_stats",
             function (req, res, next) {
                 res.send({
                     dropConnectionCount: dropConnectionCount,
@@ -51,35 +51,35 @@ server.get('/get_stats',
                 });
             });
 
-server.post('/drop_connection',
+server.post("/drop_connection",
             function (req, res, next) {
                 dropConnectionCount++;
                 res.socket.destroy();
             });
 
-server.post('/timeout',
+server.post("/timeout",
             function (req, res, next) {
                 timeoutCount++;
                 res.socket.destroy();
             });
 
-server.get('/get_info',
+server.get("/get_info",
             function (req, res, next) {
                 get_info++;
                 res.send("info");
             });
 
 
-server.post('/post_info_params_json',
+server.post("/post_info_params_json",
             function (req, res, next) {
-                if(JSON.parse(req.body).json_1) {
+                if(req.body.json_1) {
                     res.send("ok");
                 } else {
                     handleError(next, "invalid json");
                 }
             });
 
-server.post('/post_info_params_form',
+server.post("/post_info_params_form",
             function (req, res, next) {
                 if(querystring.parse(req.body).form_1) {
                     res.send("ok");
@@ -93,9 +93,8 @@ server.post('/post_info_params_form',
  * POST COMMENTS
  */
 
-let DataError = require('./DataError.js');
-
-let BlogData = require('./blogData.js');
+let DataError = require("./DataError.js");
+let BlogData = require("./blogData.js");
 
 function catchErrors(callback) {
   return async function errorHandler(req, res, next) {
@@ -114,67 +113,67 @@ function catchErrors(callback) {
 }
 
 
-server.get('/posts', catchErrors(async (req, res, next) => {
+server.get("/posts", catchErrors(async (req, res, next) => {
     res.send(BlogData.allPosts());
 }));
 
-server.post('/posts', catchErrors(async (req, res, next) => {
-    res.send({id: BlogData.addPost(JSON.parse(req.body))});
+server.post("/posts", catchErrors(async (req, res, next) => {
+    res.send({id: BlogData.addPost(req.body)});
 }));
-server.put('/posts/:id', catchErrors(async (req, res, next) => {
-    BlogData.updatePost(req.params.id, JSON.parse(req.body));
+server.put("/posts/:id", catchErrors(async (req, res, next) => {
+    BlogData.updatePost(req.params.id, req.body);
     res.status(204);
-    res.send(renderMessage('ok'));
+    res.send(renderMessage("ok"));
 }));
 
-server.get('/posts/:id', catchErrors(async (req, res, next) => {
+server.get("/posts/:id", catchErrors(async (req, res, next) => {
     res.send(BlogData.getPost(req.params.id));
 }));
-server.del('/posts/:id', catchErrors(async (req, res, next) => {
+server.del("/posts/:id", catchErrors(async (req, res, next) => {
     res.send(BlogData.deletePost(req.params.id));
 }));
 
-server.post('/posts/:postId/comments', catchErrors(async (req, res, next) => {
-    res.send({id: BlogData.addComment(req.params.postId, JSON.parse(req.body))});
+server.post("/posts/:postId/comments", catchErrors(async (req, res, next) => {
+    res.send({id: BlogData.addComment(req.params.postId, req.body)});
 }));
-server.put('/posts/:postId/comments/:commentId', catchErrors(async (req, res, next) => {
-    BlogData.updateComment(req.params.postId, req.params.commentId, JSON.parse(req.body));
+server.put("/posts/:postId/comments/:commentId", catchErrors(async (req, res, next) => {
+    BlogData.updateComment(req.params.postId, req.params.commentId, req.body);
     res.status(204);
-    res.send(renderMessage('ok'));
+    res.send(renderMessage("ok"));
 }));
-server.get('/posts/:postId/comments/:commentId', catchErrors(async (req, res, next) => {
+server.get("/posts/:postId/comments/:commentId", catchErrors(async (req, res, next) => {
     res.send(BlogData.getComment(req.params.postId, req.params.commentId));
 }));
-server.del('/posts/:postId/comments/:commentId', catchErrors(async (req, res, next) => {
+server.del("/posts/:postId/comments/:commentId", catchErrors(async (req, res, next) => {
     res.send(BlogData.deleteComment(req.params.postId, req.params.commentId));
 }));
 
 
 
-server.get('/', restify.plugins.serveStatic({
+server.get("/", restify.plugins.serveStatic({
   directory: __dirname,
-  default: 'index.html'
+  default: "index.html"
 }));
 
-server.get('/NetworkClient.js', restify.plugins.serveStatic({
-  directory: path.join(__dirname, '../../', 'lib'),
-  default: 'NetworkClient.js'
+server.get("/NetworkClient.js", restify.plugins.serveStatic({
+  directory: path.join(__dirname, "../../", "lib"),
+  default: "NetworkClient.js"
 }));
 
-server.get('/modules/*', restify.plugins.serveStatic({
-  directory: path.join(__dirname, '../', 'networkModules'),
+server.get("/modules/*", restify.plugins.serveStatic({
+  directory: path.join(__dirname, "../", "networkModules"),
   appendRequestPath: false
 }));
 
 var WEBServer = {
     start: function(port) {
-        console.log('WEB Server starting')
-        server.listen(port, '127.0.0.1', function () {
-            console.log('%s listening at %s' , server.name, server.url);
+        console.log("WEB Server starting")
+        server.listen(port, "127.0.0.1", function () {
+            console.log("%s listening at %s" , server.name, server.url);
         });
     },
     stop() {
-        console.log('WEB Server stopping.')
+        console.log("WEB Server stopping.")
         server.close();
     }
 }

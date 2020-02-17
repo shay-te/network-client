@@ -28,12 +28,12 @@ describe('Validate listeners are called', function() {
 
     let validatePostGetStore = function(method, url, data, options) {
         assert.equal(method, Network.HttpMethod.GET);
-        assert.equal(/^https:\/\/127.0.0.1:8901\/posts\/\d+$/.test(url), true);
+        assert.equal(/^http:\/\/127.0.0.1:8901\/posts\/\d+$/.test(url), true);
         assert.deepEqual(data, {});
         assert.equal(options['store'], true);
         assert.equal(options['storeExpiration'], 0);
     }
-    before(function(done) {
+    before(async function() {
         let port = 8901;
         server = require('./web/server.js');
         server.start(port);
@@ -41,22 +41,26 @@ describe('Validate listeners are called', function() {
         let NetworkClient = require("../lib/NetworkClient.js");
 
         Network = new NetworkClient({baseURL: "http://127.0.0.1:" + port + "/", json: true, debug: true});
+        Network.addRequestHeader("Content-Type", "application/json");
 
         Network.registerModule("posts", require("./networkModules/networkPost.js"));
         Network.registerModule("comments", require("./networkModules/networkComment.js"));
-        done();
+
+        for(var i = 0 ; i < 10 ; i++) {
+            await Network.posts.create("some title " + i, "some content " + i);
+        }
     });
 
 
     after(function(done) {
         server.stop();
-        done()
+        done();
     });
 
-    it('should return -1 when the value is not present', async function() {
+    it('1 simple GET request', async function() {
         //WAIT FOR OTHER TEST EVENTS TO CLEAR
-        let waitEventsAreClearTime = 2000;
-        this.timeout(waitEventsAreClearTime + 4000); // Don't fail test for timeout
+        let waitEventsAreClearTime = 500;
+        this.timeout(waitEventsAreClearTime + 2000); // Don't fail test for timeout
         await Helpers.sleep(waitEventsAreClearTime);
 
         let networkStartCalled = 0, networkEndCalled = 0, networkErrorCalled = 0, networkStorageCalled = 0;
@@ -87,6 +91,15 @@ describe('Validate listeners are called', function() {
         assert.equal(networkErrorCalled, 0);
         assert.equal(networkStorageCalled, 0);
         Network.removeNetworkListener(networkListener);
+    });
+
+    it('2 Partial network event methods', async function() {
+        //WAIT FOR OTHER TEST EVENTS TO CLEAR
+        let waitEventsAreClearTime = 500;
+        this.timeout(waitEventsAreClearTime + 2000); // Don't fail test for timeout
+        await Helpers.sleep(waitEventsAreClearTime);
+
+        let networkStartCalled = 0, networkEndCalled = 0, networkErrorCalled = 0, networkStorageCalled = 0;
 
         /**
          * Test callback networkStart only
@@ -98,16 +111,16 @@ describe('Validate listeners are called', function() {
             }
         });
         Network.addNetworkListener(networkListenerPartial);
-        await Network.posts.get(1)
-        assert.equal(networkStartCalled, 2);
-        assert.equal(networkEndCalled, 1);
+        await Network.posts.get(5)
+        assert.equal(networkStartCalled, 1);
+        assert.equal(networkEndCalled, 0);
         assert.equal(networkErrorCalled, 0);
         assert.equal(networkStorageCalled, 0);
 
         Network.removeNetworkListener(networkListenerPartial);
     });
 
-    it('Listener for storage', async function() {
+    it('3 Listener for storage', async function() {
         /**
          * Test storage
          **/
@@ -129,12 +142,12 @@ describe('Validate listeners are called', function() {
             }
         });
         Network.addNetworkListener(networkListenerPartial2);
-        await Network.posts.getPostStore(1); // First call will fetch from network
-        await Network.posts.getPostStore(1);
-        await Network.posts.getPostStore(1);
-        await Network.posts.getPostStore(1);
-        await Network.posts.getPostStore(2); // Different post id also cache
-        await Network.posts.getPostStore(2);
+        await Network.posts.getPostStore(6); // First call will fetch from network
+        await Network.posts.getPostStore(6);
+        await Network.posts.getPostStore(6);
+        await Network.posts.getPostStore(6);
+        await Network.posts.getPostStore(7); // Different post id also cache
+        await Network.posts.getPostStore(7);
 
 
         assert.equal(networkStartCalled, 2);

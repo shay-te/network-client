@@ -5,7 +5,9 @@ let assert = require('chai').assert;
 
 process.env.NODE_ENV = 'test'
 var NetworkClient = require("../lib/NetworkClient.js");
-var Network = new NetworkClient({baseURL: "https://jsonplaceholder.typicode.com/"});
+let port = 8901;
+Network = new NetworkClient({baseURL: "http://127.0.0.1:" + port + "/", json: true, debug: true});
+Network.addRequestHeader("Content-Type", "application/json");
 
 
 describe("Validate storage work properly", function() {
