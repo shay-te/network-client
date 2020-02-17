@@ -77,11 +77,6 @@ describe("Validate options", function() {
         assert.equal(stats.dropConnectionCount, 10);
         assert.equal(stats.timeoutCount, 10);
         assert.equal(stats.get_info, 2);
-
-        // 1. register single method
-        // 3. docs
-        // 4. upload example
-
     });
 
     it("5 send json/form", async function() {
