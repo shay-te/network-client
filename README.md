@@ -278,9 +278,36 @@ var data = await Network.posts.get(1);
 ```
 
 
+### File Upload
+
+```javascript
+var moduleAssets = function(network) {
+	return {
+		upload: function(inputFile, success, error) {
+			var fd = new FormData();
+			fd.append('file', inputFile);
+            network.post('api/user/photo', fd, {}, success, error);
+		}
+   };
+}
+Network.registerModule('assets', moduleAssets);
+
+// React change event
+function onFileInputChange(e) {
+	Network.assets.upload(inputFile.current.files[0], 
+						  function() {...}, 
+						  function() {...});
+}
+```
+
+```html
+// React JSX
+<input type='file' id='file' ref={inputFile} style={{display: 'none'}} accept="image/*" onChange={onFileInputChange}/>
+```
 
 
 
 ### Thank You For Reading !.
+
 ### You Are a Star.    
 (If you like this project please star it) 
