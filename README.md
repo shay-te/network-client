@@ -282,12 +282,12 @@ var data = await Network.posts.get(1);
 
 ```javascript
 var moduleAssets = function(network) {
-	return {
-		upload: function(inputFile, success, error) {
-			var fd = new FormData();
-			fd.append('file', inputFile);
+    return {
+        upload: function(inputFile, success, error) {
+            var fd = new FormData();
+            fd.append('file', inputFile);
             network.post('api/user/photo', fd, {}, success, error);
-		}
+        }
    };
 }
 Network.registerModule('assets', moduleAssets);
