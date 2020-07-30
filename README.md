@@ -1,7 +1,7 @@
 # Network-Client
 
 Network-Client it's a small footprint javascript REST client.    
-Aim to give a declarative simple interface with capabilities of storage, retries And event handling.    
+Aim to give a declarative simple interface with capabilities of storage, retries, And event handling.    
 it has no dependencies and written to support old browsers like IE8.  
 
 ### Installing
@@ -48,78 +48,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) f
 # Instructions
 
 
-
-## Global Request headers
-
-Supported headers values are `String`, `Array` and `Function`.
-```javascript
-var NetworkClient = require("network-client");
-var Network = new NetworkClient();
-
-Network.addRequestHeader("Content-Type", "application/json");
-Network.addRequestHeader("Cache-control", ["no-cache", "no-store"]);
-Network.addRequestHeader("Pragma", "no-cache");
-Network.addRequestHeader("Expires", "0");
-
-var tokenElement = document.getElementsByName("csrfmiddlewaretoken")
-if(tokenElement && tokenElement.length > 0) {
-    var checkCsrfHeader = function(method, url, data, contentType) {
-        if(!(/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))) {
-            return tokenElement[0].value;
-        }
-        return; // Don't return anything will skip this header
-    }
-    Network.addRequestHeader("X-CSRFToken", checkCsrfHeader);
-}
-
-...
-
-Network.removeRequestHeader("some-header");
-```
-
-
-
-## Promise Support
-
-By default, `NetwokrClient` is using the native `Promise` object.
-in cases where native `Promise` is not available, `NetworkClient` can be told what is the Promise object.
-
-```javascript
-Network.setPromise(MyPromiseObject);
-```
-
-
-
-## Network Events
-
-`NetworkClient` can notify `NetworkClient.NetworkListener` event listener on API calls such as `start`, `end`, `error` And when `storage` is used.    
-
-```javascript
-var netowrkListener = new NetworkClient.NetworkListener({
-    networkStart: function(method, url, data, options) {
-        if(method == NetworkClient.HttpMethod.GET && url.indexOf("/user") > -1) {
-            //Show saving user information notifications
-        }
-    },
-    networkEnd: function(method, url, data, options) {
-    },
-    networkError: function(method, url, data, options) {
-        console.error("Error while calling url: " + url);
-        if(method == NetworkClient.HttpMethod.POST &&  url != "../error") {
-            NetowrkClient.errors.register(data)
-        }
-    }    
-})
-Network.addNetworkListener(networkListener);
-
-...
-...
-
-Network.removeNetworkListener(networkListener);
-```
-
-
-
 ## Request Configuration
 
 The configuration is a simple JSON object that can be used globally for all requests, And for an individual request. When no configuration specified the default config object is used.  
@@ -150,7 +78,7 @@ Network = new NetworkClient({"json": true, ..});
 
 Modules are a great way to group REST operation, make separation of concerns And load them only when they are needed.
 
-The module is a simple `javascript` `function` that accepts an instance of `NetworkClient` for it's first parameter. 
+The module is a simple `javascript` `function` that accepts an instance of `NetworkClient` for its first parameter. 
 `NetowrkClient` instance expose functions to send HTTP request. with or without Promise.
 
 Available functions to send a request with `Promise`
@@ -278,15 +206,113 @@ var data = await Network.posts.get(1);
 ```
 
 
+## Headers
+
+Supported headers values are `String`, `Array`, `Function`, and `undefined`.
+
+##### Global Headers
+```javascript
+var NetworkClient = require("network-client");
+var Network = new NetworkClient();
+
+// Cache headers
+Network.addRequestHeader("Content-Type", "application/json");
+Network.addRequestHeader("Pragma", "no-cache");
+Network.addRequestHeader("Expires", "0");
+
+// Array headers
+Network.addRequestHeader("Cache-control", ["no-cache", "no-store"]);
+
+// function headers
+var tokenElement = document.getElementsByName("csrfmiddlewaretoken")
+if(tokenElement && tokenElement.length > 0) {
+    var checkCsrfHeader = function(method, url, data, contentType) {
+        if(!(/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))) {
+            return tokenElement[0].value;
+        }
+        return; // Don't return anything will skip this header
+    }
+    Network.addRequestHeader("X-CSRFToken", checkCsrfHeader);
+}
+
+...
+
+// undefined headers will remove `some-header` from the request
+Network.removeRequestHeader("some-header");
+```
+##### Request Headers
+```javascript
+
+
+Network.post('/some/url', {}, {'Content-Type': undefined}, successCallback,);
+var exampleModule = function(network) {
+   return { 
+        get_x: function() { 
+            // Will set headers for this specfic request
+            var x_headers = {'Expires': 'Wed, 21 Oct 2015 07:28:00 GMT'};
+            return network.get_promise('api/x', {}, {headers:x_headers}); 
+        }
+        get_y: function() { 
+            // Will delete the 'Content-Type' header for this epcific request
+            var y_headers = {'Content-Type': undefined};
+            return network.get_promise('api/y', {}, {headers:y_headers});
+        }
+   };
+}
+
+```
+
+## Promise Support
+
+By default, `NetwokrClient` is using the native `Promise` object.
+in cases where native `Promise` is not available, `NetworkClient` can be told what is the Promise object.
+
+```javascript
+Network.setPromise(MyPromiseObject);
+```
+
+
+
+## Network Events
+
+`NetworkClient` can notify `NetworkClient.NetworkListener` event listener on API calls such as `start`, `end`, `error`, And when `storage` is used.    
+
+```javascript
+var netowrkListener = new NetworkClient.NetworkListener({
+    networkStart: function(method, url, data, options) {
+        if(method == NetworkClient.HttpMethod.GET && url.indexOf("/user") > -1) {
+            //Show saving user information notifications
+        }
+    },
+    networkEnd: function(method, url, data, options) {
+    },
+    networkError: function(method, url, data, options) {
+        console.error("Error while calling url: " + url);
+        if(method == NetworkClient.HttpMethod.POST &&  url != "../error") {
+            NetowrkClient.errors.register(data)
+        }
+    }    
+})
+Network.addNetworkListener(networkListener);
+
+...
+...
+
+Network.removeNetworkListener(networkListener);
+```
+
 ### File Upload
 
 ```javascript
 var moduleAssets = function(network) {
     return {
-        upload: function(inputFile, success, error) {
+        upload: function(inputFile, Settingsuccess, error) {
             var fd = new FormData();
             fd.append('file', inputFile);
-            network.post('api/user/photo', fd, {}, success, error);
+            // By removing the 'Content-Type' header.
+            // The browser will generate the correct value `multipart/form-data; boundary=----WebKitFormBoundaryrjNI4ttyPd2AVBfI` 
+            var uploadConfig = {headers: {'Content-Type': undefined}};
+            network.post('api/user/photo', fd, uploadConfig, success, error);
         }
    };
 }
