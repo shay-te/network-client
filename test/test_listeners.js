@@ -10,9 +10,10 @@ describe('Validate listeners are called', function() {
     let Network;
     let server;
 
-    let validatePostAll = function(method, url, data, options) {
+    let validatePostAll = function(method, url, data, options, status) {
         assert.equal(method, Network.HttpMethod.GET);
         assert.equal(url, "http://127.0.0.1:8901/posts");
+        assert.equal(status, 200);
         assert.deepEqual(data, {});
         assert.equal(options['store'], false);
         assert.equal(options['storeExpiration'], 0);
@@ -68,15 +69,15 @@ describe('Validate listeners are called', function() {
         assert.throws(function() {Network.addNetworkListener({});}, "");
         let networkListener = new Network.NetworkListener({
             networkStart: function(method, url, data, options) {
-                validatePostAll(method, url, data, options);
+                validatePostAll(method, url, data, options, 200);
                 networkStartCalled++;
             },
-            networkEnd: function(method, url, data, options) {
-                validatePostAll(method, url, data, options);
+            networkEnd: function(method, url, data, options, status) {
+                validatePostAll(method, url, data, options, status);
                 networkEndCalled++;
             },
-            networkError: function(method, url, data, options) {
-                validatePostAll(method, url, data, options);
+            networkError: function(method, url, data, options, status) {
+                validatePostAll(method, url, data, options, status);
                 networkErrorCalled++;
             },
             networkStorage: function(method, url, data, options) {

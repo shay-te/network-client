@@ -60,33 +60,38 @@ describe("Validate options", function() {
     it("4 Store expiration", async function() {
         let storeExpiration = 1000;
         let info = await Network.test.get_info(storeExpiration);
-        assert.equal(info, "info");
+        assert.equal(info.data, "info");
+        assert.equal(info.status, 200);
 
         for(let i = 0 ; i < 10 ; i++) {
             info = await Network.test.get_info(storeExpiration);
-            assert.equal(info, "info");
+            assert.equal(info.data, "info");
+            assert.equal(info.status, undefined);
         }
         await Helpers.sleep(1000);
         info = await Network.test.get_info(storeExpiration);
-        assert.equal(info, "info");
+        assert.equal(info.data, "info");
+        assert.equal(info.status, 200);
     });
 
 
     it("5 All tests stats", async function() {
         let stats = await Network.test.get_stats();
-        assert.equal(stats.dropConnectionCount, 10);
-        assert.equal(stats.timeoutCount, 10);
-        assert.equal(stats.get_info, 2);
+        assert.equal(stats.data.dropConnectionCount, 10);
+        assert.equal(stats.data.timeoutCount, 10);
+        assert.equal(stats.data.get_info, 2);
     });
 
     it("5 send json/form", async function() {
         let json_res = await Network.test.post_info_params_json();
-        assert.equal(json_res, "ok");
+        assert.equal(json_res.data, "ok");
+        assert.equal(json_res.status, 200);
 
 
         Network.removeRequestHeader("Content-Type");
         let form_res = await Network.test.post_info_params_form();
-        assert.equal(form_res, "ok");
+        assert.equal(form_res.data, "ok");
+        assert.equal(form_res.status, 200);
     });
 
 });

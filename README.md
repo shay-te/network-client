@@ -152,7 +152,7 @@ var modulePosts = function(network) {
    return {
       get: function(post_id, success, error) {
          return network.get('api/posts/' + item_id, {}, {}, 
-                            function(data){proc_get(data, success)}, 
+                            function(data, status){proc_get(data, success)}, 
                             error);
       },
       create: function(data, success, error) {
@@ -202,7 +202,9 @@ And using the module
 ```javascript
 Network.registerModule('details', moduleDetails);
 
-var data = await Network.posts.get(1);
+var response = await Network.posts.get(1);
+console.log(response.data); // prints the response data
+console.log(response.status); // prints the response status code
 ```
 
 
@@ -284,9 +286,9 @@ var netowrkListener = new NetworkClient.NetworkListener({
             //Show saving user information notifications
         }
     },
-    networkEnd: function(method, url, data, options) {
+    networkEnd: function(method, url, data, options, status) {
     },
-    networkError: function(method, url, data, options) {
+    networkError: function(method, url, data, options, status) {
         console.error("Error while calling url: " + url);
         if(method == NetworkClient.HttpMethod.POST &&  url != "../error") {
             NetowrkClient.errors.register(data)

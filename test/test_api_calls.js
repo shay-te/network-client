@@ -71,8 +71,9 @@ describe("Validate all requests are returning", function() {
         let updateContent = "one body1";
         await Network.posts.update(1, {"title": updateTitle, "content": updateContent});
         let post = await Network.posts.get(1);
-        assert.equal(post.title, updateTitle);
-        assert.equal(post.content, updateContent);
+        assert.equal(post.data.title, updateTitle);
+        assert.equal(post.data.content, updateContent);
+        assert.equal(post.status, 200);
 
         await Network.posts.del(1);
 
