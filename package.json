@@ -1,6 +1,6 @@
 {
   "name": "network-client",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Network client for defining declarative api calls ",
   "main": "index.js",
   "directories": {
