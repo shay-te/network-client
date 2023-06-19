@@ -59,11 +59,11 @@ describe("Validate all requests are returning", function() {
         }
 
         Network.posts.all()
-            .then(function(all) {validateAll(all)})
+            .then(function(all) {validateAll(all.data)})
             .catch(failCallback);
 
         Network.posts.get(1)
-            .then(function(post){validateGet(post);})
+            .then(function(post){validateGet(post.data);})
             .catch(failCallback);
 
         let updateTitle = "one title1";
