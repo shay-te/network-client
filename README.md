@@ -71,6 +71,7 @@ Network = new NetworkClient({"json": true, ..});
     * `0` expires on reload 
     * `123..` time in milliseconds  
 * `debug` Will print networks errors to `console.error` . (type: `boolean`, default: `false`)
+* `withCredentials` property is a boolean value that indicates whether or not cross-site Access-Control requests should be made using credentials such as cookies, authorization headers or TLS client certificates. (type: `boolean`, default: `false`)
 
 
 
@@ -190,6 +191,7 @@ var moduleDetails = function(network) {
                 backOffFactor: 505, // Wait 505 miliseconds between requests.
                 store: true, // Store the returned data.
                 storeExpiration: undefined // Store in localstorage or fallback storage.
+                withCredentials: true // Will send cookies or other credentials with the request to the server
             };
          return network.get_promise('api/data/' + data_id, {}, config);
       },

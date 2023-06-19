@@ -34,7 +34,7 @@ let validateGet = function(post) {
 describe("Validate all requests are returning", function() {
     let Network;
     let server;
-    before(function(done) {
+    before(function() {
         let port = 8901;
         server = require('./web/server.js');
         server.start(port);
@@ -45,7 +45,6 @@ describe("Validate all requests are returning", function() {
 
         Network.registerModule("posts", require("./networkModules/networkPost.js"));
         Network.registerModule("comments", require("./networkModules/networkComment.js"));
-        done();
     });
 
     after(function(done) {
@@ -60,11 +59,11 @@ describe("Validate all requests are returning", function() {
         }
 
         Network.posts.all()
-            .then(function(all) {validateAll(all)})
+            .then(function(all) {validateAll(all.data)})
             .catch(failCallback);
 
         Network.posts.get(1)
-            .then(function(post){validateGet(post);})
+            .then(function(post){validateGet(post.data);})
             .catch(failCallback);
 
         let updateTitle = "one title1";
