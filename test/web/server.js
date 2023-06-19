@@ -97,54 +97,54 @@ let DataError = require("./DataError.js");
 let BlogData = require("./blogData.js");
 
 function catchErrors(callback) {
-  return async function errorHandler(req, res, next) {
+  return async function errorHandler(req, res) {
     try {
-      await callback(req, res, next)
+      await callback(req, res)
     } catch (err) {
 //        console.error(err);
         if(err instanceof DataError) {
             res.status(err.status);
             res.send({"error": err.message});
         } else {
-            next(new errors.InternalServerError(err));
+            res.send(new errors.InternalServerError(err));
         }
     }
   }
 }
 
 
-server.get("/posts", catchErrors(async (req, res, next) => {
+server.get("/posts", catchErrors(async (req, res) => {
     res.send(BlogData.allPosts());
 }));
 
-server.post("/posts", catchErrors(async (req, res, next) => {
+server.post("/posts", catchErrors(async (req, res) => {
     res.send({id: BlogData.addPost(req.body)});
 }));
-server.put("/posts/:id", catchErrors(async (req, res, next) => {
+server.put("/posts/:id", catchErrors(async (req, res) => {
     BlogData.updatePost(req.params.id, req.body);
     res.status(204);
     res.send(renderMessage("ok"));
 }));
 
-server.get("/posts/:id", catchErrors(async (req, res, next) => {
+server.get("/posts/:id", catchErrors(async (req, res) => {
     res.send(BlogData.getPost(req.params.id));
 }));
-server.del("/posts/:id", catchErrors(async (req, res, next) => {
+server.del("/posts/:id", catchErrors(async (req, res) => {
     res.send(BlogData.deletePost(req.params.id));
 }));
 
-server.post("/posts/:postId/comments", catchErrors(async (req, res, next) => {
+server.post("/posts/:postId/comments", catchErrors(async (req, res) => {
     res.send({id: BlogData.addComment(req.params.postId, req.body)});
 }));
-server.put("/posts/:postId/comments/:commentId", catchErrors(async (req, res, next) => {
+server.put("/posts/:postId/comments/:commentId", catchErrors(async (req, res) => {
     BlogData.updateComment(req.params.postId, req.params.commentId, req.body);
     res.status(204);
     res.send(renderMessage("ok"));
 }));
-server.get("/posts/:postId/comments/:commentId", catchErrors(async (req, res, next) => {
+server.get("/posts/:postId/comments/:commentId", catchErrors(async (req, res) => {
     res.send(BlogData.getComment(req.params.postId, req.params.commentId));
 }));
-server.del("/posts/:postId/comments/:commentId", catchErrors(async (req, res, next) => {
+server.del("/posts/:postId/comments/:commentId", catchErrors(async (req, res) => {
     res.send(BlogData.deleteComment(req.params.postId, req.params.commentId));
 }));
 
